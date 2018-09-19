@@ -51,6 +51,13 @@ class Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid extends Mage_
 					'product_id=entity_id',
 					'{{table}}.stock_id=1',
 					'left');
+
+			$collection->joinField('is_in_stock',
+					'cataloginventory/stock_item',
+					'is_in_stock',
+					'product_id=entity_id',
+					'{{table}}.stock_id=1',
+					'left');
 		}
 		if ($store->getId()) {
 			//$collection->setStoreId($store->getId());
@@ -196,6 +203,16 @@ class Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid extends Mage_
 							'type'  => 'number',
 							'index' => 'qty',
 					));
+			
+			$this->addColumn('is_in_stock',
+					array(
+							'header' => Mage::helper('catalog')->__('Is In Stock'),
+							'width'  => '70px',
+							'index'  => 'is_in_stock',
+							'type'   => 'options',
+							'options'=> Mage::getSingleton('adminhtml/system_config_source_yesno')->toArray(),
+					));
+			
 		}
 		
 		$this->addColumn('visibility',
