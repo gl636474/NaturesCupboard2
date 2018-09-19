@@ -6,7 +6,6 @@
  * a Product subdirectory for the Magento autoload facility to find it.
  * 
  * @author gareth
- *
  */
 class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 {
@@ -30,7 +29,7 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 	 * represents the categories to which products should be added to if the
 	 * product has the specified attribute set to true.
 	 */
-	private function getAttributeCodeToCategoryUrlKeyMapping()
+	protected function getAttributeCodeToCategoryUrlKeyMapping()
 	{
 		$mappings = array();
 		$model = Mage::getModel('attribtocategorymapping/attribtocategorymapping');
@@ -42,34 +41,24 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 			$categoryUrlKey = $thisMapping->getCategoryUrlKey();
 			
 			$mappings[$attributeCode] = $categoryUrlKey;
-			Mage::log($attributeCode.'=>'.$categoryUrlKey, null, 'gareth.log');
 		}
 		return $mappings;
 	}
 	
-	/**
-	 * Function call ed the observer configured in config.xml
-	 * 
-	 * @param unknown $observer
-	 */
-	public function autoSetCategories($observer)
+	protected function setProductCategories($product)
 	{
-		/* @var Mage_Catalog_Model_Product $product */
-		$product = $observer->getEvent()->getProduct();
-		
 		$productName = $product->getName();
-		Mage::log('Called autoSetCategories on '.$productName, null, 'gareth.log');
-
 		$mappings = $this->getAttributeCodeToCategoryUrlKeyMapping();
-		
-		$categoryIds = array();
 		$product_attributes = $product->getAttributes();//self::$_attributeSetGroupName, false);
-		Mage::log($productName.' has '.count($product_attributes).' attributes', null, 'gareth.log');
+
+		$categoryIds = array();
 		/* @var Mage_Catalog_Model_Resource_Eav_Attribute $thisAttribute */
 		foreach ($product_attributes as $thisAttribute)
 		{
 			$thisAttributeCode = $thisAttribute->getAttributeCode();
-			if (array_key_exists($thisAttributeCode, $mappings) && $product->getData($thisAttributeCode))
+			$thisAttributeIsMapped = array_key_exists($thisAttributeCode, $mappings);
+			$thisAttributeIsTrue = $product->getData($thisAttributeCode);
+			if ($thisAttributeIsMapped && $thisAttributeIsTrue)
 			{
 				$categoryUrlKeyToAddTo = $mappings[$thisAttributeCode];
 				
@@ -79,27 +68,66 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 				$categoryToAddTo = $lookup->findCategoryByUrlKey(self::$_theStoreRegex, $categoryUrlKeyToAddTo);
 				if (!is_null($categoryToAddTo))
 				{
-					Mage::log($thisAttributeCode.' maps to category '.$categoryUrlKeyToAddTo.'('.$categoryId.')', null, 'gareth.log');
 					$categoryId = $categoryToAddTo->getId();
-					$categoryIds[] = $categoryId;
+					
 					$parentCategoryIds = $categoryToAddTo->getParentIds();
+					$categoryIds[] = $categoryId;
 					$categoryIds = array_merge($categoryIds, $parentCategoryIds);
-				}
-				else
-				{
-					Mage::log($thisAttributeCode.' maps to non existent category urlkey:'.$categoryUrlKeyToAddTo, null, 'gareth.log');
 				}
 			}
 		}
-
+		
 		$categoryIds = array_unique($categoryIds);
 		$product->setCategoryIds($categoryIds);
 		Mage::log('Product '.$productName.' re-assigned categories: '.implode(',',$categoryIds), null, 'gareth.log');
+	}
+	
+	/**
+	 * Function called the catalog_product_save_before
+	 * observer configured in config.xml
+	 * 
+	 * @param unknown $observer
+	 */
+	public function setCategoriesOnProduct($observer)
+	{
+		/* @var Mage_Catalog_Model_Product $product */
+		$product = $observer->getEvent()->getProduct();
 		
+		Mage::log('setCategoriesOnProduct called on '.$product->getName(), null, 'gareth.log');
+		
+		$this->setProductCategories($product);
 		
 		// TODO flush cache if made any changes ?
 	
 	} 
 	
+	/**
+	 * Function called the catalog_product_import_finish_before
+	 * observer configured in config.xml
+	 *
+	 * @param unknown $observer
+	 */
+	function setCategoriesOnAllProducts($observer)
+	{
+		Mage::log('setCategoriesOnAllProducts called', null, 'gareth.log');
+		
+		$allProducts = Mage::getModel('catalog/product')->getCollection()->addAttributeToSelect('*');
+		/* @var Mage_Catalog_Model_Product $product */
+		foreach ($allProducts as $product)
+		{
+			Mage::log('setting categories on '.$product->getName(), null, 'gareth.log');
+			//$this->setProductCategories($product);
+			// this triggers catalog_product_save_before observer 
+			$product->save();
+		}
 	
+// DOES NOT WORK		
+//		/* @var $indexCollection Mage_Index_Model_Resource_Process_Collection */
+//		$indexCollection = Mage::getModel('index/process')->getCollection();
+//		foreach ($indexCollection as $index)
+//		{
+//			/* @var $index Mage_Index_Model_Process */
+//			$index->reindexAll();
+//		}
+	}
 }

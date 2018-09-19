@@ -47,6 +47,13 @@
                 <class>Gareth_NaturesCupboard2_Helper</class>
             </gareth_naturescupboard2>
         </helpers>
+        <blocks>
+             <adminhtml> 
+                <rewrite>
+                    <catalog_product_grid>Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid</catalog_product_grid>
+                </rewrite>
+             </adminhtml>
+        </blocks>
  	</global>
 	<adminhtml>
         <events>
@@ -55,10 +62,35 @@
                     <Gareth_NaturesCupboard2_Model_Product_Save_Observer>
                     	<type>singleton</type>
                         <class>Gareth_NaturesCupboard2_Model_Observer</class>
-                        <method>autoSetCategories</method>
+                        <method>setCategoriesOnProduct</method>
                     </Gareth_NaturesCupboard2_Model_Product_Save_Observer>
                 </observers>
             </catalog_product_save_before>
+            <catalog_product_import_finish_before>
+                <observers>
+                    <Gareth_NaturesCupboard2_Model_Product_Save_Observer>
+                    	<type>singleton</type>
+                        <class>Gareth_NaturesCupboard2_Model_Observer</class>
+                        <method>setCategoriesOnAllProducts</method>
+                    </Gareth_NaturesCupboard2_Model_Product_Save_Observer>
+                </observers>
+            </catalog_product_import_finish_before>
         </events>
     </adminhtml>
+    <admin>
+    	<routers>
+    		<!-- The Magento module being overridden -->
+    		<adminhtml>
+    			<args>
+                	<modules>
+                		<!-- Tag is our PackageName_ModuleName namespace. The content path must match that in 
+                			 the before attribute - with just the namespace changed. Controller class
+                			 must go in Module/controllers/overridedn-module/path/controller where path matches the path under 
+                			 the module in Magento-->
+                		<Gareth_NaturesCupboard2 before="Mage_Adminhtml">Gareth_NaturesCupboard2_Adminhtml</Gareth_NaturesCupboard2>
+                	</modules>
+                </args>
+    		</adminhtml>
+    	</routers>
+    </admin>
 </config>
