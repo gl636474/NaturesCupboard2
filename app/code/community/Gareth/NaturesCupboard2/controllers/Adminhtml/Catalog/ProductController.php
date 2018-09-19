@@ -24,13 +24,12 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 	 * @var array
 	 */
 	protected static $fieldsToExport = array(
-			'name',
-			'price',
 			'status',
+			'price',
+			'name',
 			'tax_class_id',
 			'url_key',
 			'visibility',
-			'weight',
 			
 			'is_food',
 			'is_personal_care',
@@ -48,6 +47,7 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			'is_gmo_free',
 			'ingredients',
 			
+			'weight',
 			'package_height',
 			'package_width',
 			'package_depth',
@@ -82,12 +82,12 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 		else
 		{
 			//write headers to the csv file
-			$content = '"sku","_type","_attribute_set","qty","is_in_stock"';
+			$content = '"sku","qty","is_in_stock"';
 			foreach (self::$fieldsToExport as $field)
 			{
 				$content .= ',"'.$field.'"';
 			}
-			$content .= "\n";
+			$content .= ',"_attribute_set","_type"'."\n";
 			
 			try
 			{
@@ -98,16 +98,18 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 					$stock_item = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product);
 					
 					$content .= '"'.$product->getSku().'"';
-					$content .= ',"'.$product->getTypeId().'"';
-					$content .= ',"'.$attribSet.'"';
 					$content .= ',"'.$stock_item->getQty().'"';
 					$content .= ',"'.$stock_item->getIsInStock().'"';
 					
 					foreach (self::$fieldsToExport as $field)
 					{
-						// TODO handle quotes in data 
-						$content .= ',"'.$product->getData($field).'"';
+						$data = $product->getData($field);
+						$data = str_replace('"', '\"', $data);
+						$content .= ',"'.$data.'"';
 					}
+					
+					$content .= ',"'.$attribSet.'"';
+					$content .= ',"'.$product->getTypeId().'"';
 					$content .= "\n";
 				}
 			}
