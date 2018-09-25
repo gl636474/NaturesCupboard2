@@ -1,7 +1,5 @@
 <?php
 
-// TODO Logo
-
 /* @var $installer Gareth_NaturesCupboard2_Model_Resource_Setup */
 $installer = $this;
 
@@ -243,5 +241,10 @@ $installer->addAttributeToCategoryMapping($attrib_dairyfree, $category_dairyfree
 $installer->addAttributeToCategoryMapping($attrib_glutenfree, $category_glutenfree);
 $installer->addAttributeToCategoryMapping($attrib_noaddedsugar, $category_noaddedsugar);
 
+
+/**
+ * Miscellaneous
+ */
+$installer->setStoreLogoPath("images/nc_logo.png", "images/nc_logo.png", "The Fairy Door Nature's Cupboard logo");
 
 $installer->endSetup(); 

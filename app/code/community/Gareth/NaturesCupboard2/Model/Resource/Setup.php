@@ -621,4 +621,70 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		//TODO Implement removeAttributeToCategoryMapping
 		die('removeAttributeToCategoryMapping not implemented');
 	}
+	
+	/**
+	 * Save a configuration change - as would be made via the 
+	 * System->Configuration admin menu option.
+	 * 
+	 * The groups_value is an array of the form:
+	 * <pre>
+	 * $groups_value[$group]['fields'][$field]['value'] = $value;
+	 * </pre>
+	 * Where 'fields' and 'value' are preset/hardcoded. The $group refers to the
+	 * collapsable parts on the right hand side of the admin system config page.
+	 * The $field is the config parameter. The $section, $group and
+	 * $field values can be got from the system_config.xml - just search for the
+	 * label text as appears on the admin HTML page.
+	 * 
+	 * @param string $section the section as per the links on the left hand side of the admin System Config page
+	 * @param array $groups_value a multidimantional array specifying group, field and value
+	 */
+	protected function saveConfig($section, $groups_values)
+	{
+		if (!empty($section) && !empty($groups_values))
+		{
+			// Set website and store to null to set the
+			// "Default Config" (as per the "Current Configuration Scope"
+			// select in to pleft of System Configuration pages).
+			// Else website=base and store=default for the store view or
+			// website=base and store=null for the website.
+			Mage::getModel('adminhtml/config_data')
+				->setSection($section)
+				->setWebsite(null)
+				->setStore(null)
+				->setGroups($groups_value)
+				->save();
+		}
+	}
+	
+	/**
+	 * Sets the frontend logo (top left) to the specified path.
+	 * 
+	 * @param string $logo_path logo image file relative to skin/frontend/PACKAGE/MODULE
+	 * @param string $small_logo_path small logo image file relative to skin/frontend/PACKAGE/MODULE
+	 * @param string $alt_text the HTML ALT text for the above images
+	 * 
+	 * @see https://stackoverflow.com/questions/2474039/magento-update-store-logo-programmatically
+	 */
+	public function setStoreLogoPath($logo_path = null, $small_logo_path = null, $alt_text = null)
+	{		
+		//create a groups array that has the value we want at the right location
+		$groups_value = array();
+		if (!empty($logo_path))
+		{
+			$groups_value['header']['fields']['logo_src']['value'] = $logo_path;
+		}
+		if (!empty($small_logo_path))
+		{
+			$groups_value['header']['fields']['logo_src_small']['value'] = $small_logo_path;
+		}
+		if (!empty($alt_text))
+		{
+			$groups_value['header']['fields']['logo_alt']['value'] = $alt_text;
+		}
+		
+		$this->saveConfig('design', $groups_value);
+		
+		Mage::log('Logo set to: '.$logo_path, Zend_Log::NOTICE, 'gareth.log');
+	}
 }
