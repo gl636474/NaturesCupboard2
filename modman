@@ -8,5 +8,4 @@ app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupbo
 
 @shell rm -rf "$PROJECT/var/cache"
 @shell rm -rf "$PROJECT/var/session"
-@shell php -f "$MODULE/flush_cache.php"
 @shell echo "Cache cleared"
