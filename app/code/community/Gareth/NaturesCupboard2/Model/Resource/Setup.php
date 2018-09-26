@@ -673,7 +673,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 				->setSection($section)
 				->setWebsite(null)
 				->setStore(null)
-				->setGroups($groups_value)
+				->setGroups($groups_values)
 				->save();
 		}
 	}
