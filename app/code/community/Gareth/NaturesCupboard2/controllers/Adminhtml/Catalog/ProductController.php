@@ -1,10 +1,20 @@
 <?php
 /**
- * @see https://magento.stackexchange.com/questions/87382/rewriting-app-code-core-mage-adminhtml-contollers-catalog-productcontroller-php
- * @see https://magento.stackexchange.com/questions/87649/how-to-override-the-product-controller-in-admin-panel
- * @see https://stackoverflow.com/questions/3468961/export-products-to-csv-from-the-admin-product-grid
- * @see https://magento.stackexchange.com/questions/208163/custom-admin-route-giving-404
+ * Natures Cupboard 2 Magento extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is copyright Gareth Ladd 2018. Not for public dissemination
+ * nor use.
+ *
+ * DISCLAIMER
+ *
+ * This program is private software. It comes without any warranty, to
+ * the extent permitted by applicable law. You may not copy, modify nor
+ * distribute it. The author takes no responsibility for any consequences of
+ * unauthorised usage of this file or any part thereof.
  */
+
 
 include_once("Mage/Adminhtml/controllers/Catalog/ProductController.php");
 
@@ -13,6 +23,10 @@ include_once("Mage/Adminhtml/controllers/Catalog/ProductController.php");
  * Mage/Adminhtml/controlers/Catalog/ProductController to add a handler 
  * for the export mass action.
  *
+ * @see https://magento.stackexchange.com/questions/87382/rewriting-app-code-core-mage-adminhtml-contollers-catalog-productcontroller-php
+ * @see https://magento.stackexchange.com/questions/87649/how-to-override-the-product-controller-in-admin-panel
+ * @see https://stackoverflow.com/questions/3468961/export-products-to-csv-from-the-admin-product-grid
+ * @see https://magento.stackexchange.com/questions/208163/custom-admin-route-giving-404
  * @author gareth
  */
 class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_Adminhtml_Catalog_ProductController

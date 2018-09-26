@@ -1,18 +1,26 @@
 <?php
 /**
+ * Natures Cupboard 2 Magento extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is copyright Gareth Ladd 2018. Not for public dissemination
+ * nor use.
+ *
+ * DISCLAIMER
+ *
+ * This program is private software. It comes without any warranty, to
+ * the extent permitted by applicable law. You may not copy, modify nor
+ * distribute it. The author takes no responsibility for any consequences of
+ * unauthorised usage of this file or any part thereof.
+ */
+
+/**
  * Override of Mage/Adminhtnl/Bock/Catalog/Grid.php to add the export option to
  * the mass action dropdown. All code is a direct copy from Magento core except
  * for that highlighted by comments.
  * 
  * @see https://stackoverflow.com/questions/3468961/export-products-to-csv-from-the-admin-product-grid
- */
-
-/**
- * Adminhtml customer grid block
- *
- * @category   Mage
- * @package    Mage_Adminhtml
- * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
