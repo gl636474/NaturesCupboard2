@@ -4,3 +4,9 @@ app/code/community/Gareth/NaturesCupboard2   app/code/community/Gareth/NaturesCu
 app/design/frontend/Gareth/NaturesCupboard2  app/design/frontend/Gareth/NaturesCupboard2
 skin/frontend/Gareth/NaturesCupboard2        skin/frontend/Gareth/NaturesCupboard2
 app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupboard2.xml
+
+
+@shell rm -rf "$PROJECT/var/cache"
+@shell rm -rf "$PROJECT/var/session"
+@shell php php -f "$MODULE/flush_cache.php"
+@shell echo "Cache cleared"
