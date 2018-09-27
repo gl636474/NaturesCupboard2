@@ -10,7 +10,7 @@ try {
     foreach($allTypes as $type => $value) {
         Mage::app()->getCacheInstance()->cleanType($type);
         Mage::dispatchEvent('adminhtml_cache_refresh_type', array('type' => $type));
-        echo "{$type} </br>";
+        echo "{$type} cache cleared\n";
     }
 } catch (Exception $e) {
     echo $e->getMessage();

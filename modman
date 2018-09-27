@@ -6,6 +6,9 @@ skin/frontend/Gareth/NaturesCupboard2        skin/frontend/Gareth/NaturesCupboar
 app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupboard2.xml
 
 
+# Clear all caches
 @shell rm -rf "$PROJECT/var/cache"
 @shell rm -rf "$PROJECT/var/session"
-@shell echo "Cache cleared"
+
+# @shell creates subshell anyway so the cd does not persist
+@shell cd $PROJECT; php -f "$MODULE/flush_cache.php"
