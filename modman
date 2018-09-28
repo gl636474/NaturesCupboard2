@@ -10,5 +10,7 @@ app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupbo
 @shell rm -rf "$PROJECT/var/cache"
 @shell rm -rf "$PROJECT/var/session"
 
-# @shell creates subshell anyway so the cd does not persist
-@shell cd $PROJECT; php -f "$MODULE/flush_cache.php"
+# DO NOT USE "$PROJECT/mage clear-cache"
+# It will screw up Magento - don't know why
+#
+@shell php "$MODULE/flush_cache.php" --mage-dir="$PROJECT"
