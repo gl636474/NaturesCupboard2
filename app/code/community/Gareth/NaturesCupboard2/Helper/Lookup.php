@@ -23,44 +23,126 @@
  */
 class Gareth_NaturesCupboard2_Helper_Lookup extends
 Mage_Core_Helper_Abstract
-{
+{	
 	/**
-	 * Cached Mage_Core_Model_Store instance. Set/Got by
-	 * getStore();
+	 * Determines whether the given string would be a valid store code. Valid 
+	 * store codes contain lowercase letters, numbers and underscore, start with
+	 * a letter and are at least one character long.
+	 * 
+	 * @param string $code the string to test
+	 * @return true if $code would be a valid store code, false otherwise
 	 */
-	private static $_theStore = null;
+	protected function isValidStoreCode($code)
+	{
+		return preg_match('/^[a-z][a-z0-9_]*$/', $code);
+	}
 	
 	/**
-	 * Returns the store if there is only one store. If there are multiple
-	 * stores then returns the store with a name like $_theStoreRegex.
-	 * Throws exception if multiple stores and no matching name.
+	 * Returns the store with the specified id/name. Optionally performs a 
+	 * regex match on the name. If no such store exists, returns null.
 	 *
-	 * @param $storeNameRegex a regular expression matching the name of the store to return
-	 * @return Mage_Core_Model_Store the first store matching $storeNameRegex
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $key the store or group or id or name or name regex of the store to return
+	 * @param boolean $regex whether $storeName is a regular expression matching the name of the store to return
+	 * @return Mage_Core_Model_Store_Group the first store matching $key or null
 	 */
-	public function getStore($storeNameRegex)
+	public function getStore($key, $regex = false)
 	{
-		if (is_null(self::$_theStore))
+		if (is_numeric($key))
 		{
+			$store = Mage::app()->getStore($key);
+			if (is_null($store))
+			{
+				$storeGroup = null;
+				Mage::log('Cannot find store with id: '.$key, Zend_Log::NOTICE, 'gareth.log');
+			}
+			else
+			{
+				$storeGroup = $store->getGroup();
+			}
+		}
+		else if (is_string($key))
+		{
+			$found = false;
+			$storeGroup = null;
 			// Mage::app() is Mage_Core_Model_App
 			$allStores = Mage::app()->getStores();
 			foreach ($allStores as $storeId => $store)
 			{
-				$storeName = $store->getGroup()->getName();
-				$viewName = $store->getName();
-				if (preg_match($storeNameRegex, $storeName))
+				$storeGroup = $store->getGroup();
+				$storeGroupName = $storeGroup->getName();
+				$storeViewName = $store->getName();
+				if ($regex && preg_match($key, $storeGroupName))
 				{
-					self::$_theStore = $store;
+					$found = true;
+					break;
+				}
+				elseif (!$regex && $storeGroupName==$key)
+				{
+					$found = true;
+					break;
 				}
 			}
-			
-			if (is_null(self::$_theStore))
+			if (!$found)
 			{
-				die("Cannot find store with name matching: ".$storeNameRegex);
+				if ($this->isValidStoreCode($key))
+				{
+					$store = Mage::app()->getStore($key);
+					if (!is_null($store))
+					{
+						$storeGroup = $store->getGroup();
+					}
+					else
+					{
+						$storeGroup = null;
+						Mage::log('Cannot find store with name or code: '.$key, Zend_Log::NOTICE, 'gareth.log');
+					}
+				}
+				else
+				{
+					$storeGroup = null;
+					Mage::log('Cannot find store with name: '.$key, Zend_Log::NOTICE, 'gareth.log');
+				}
 			}
+			//else $storeGroup correctly set in previous for loop
 		}
-		
-		return self::$_theStore;
+		else if ($key instanceof Mage_Core_Model_Store)
+		{
+			$storeGroup = $key->getGroup();
+		}
+		else if ($key instanceof Mage_Core_Model_Store_Group)
+		{
+			$storeGroup = $key;
+		}
+		else
+		{
+			$storeGroup = null;
+			Mage::log('Unknown argument passed to getStore(): '.$key, Zend_Log::WARNING, 'gareth.log');
+		}
+				
+		return $storeGroup;
+	}
+	
+	/**
+	 * Returns the website with the specified name. If no such website exists,
+	 * returns null.
+	 * 
+	 * @param unknown $websiteName the name of the website to return
+	 * @return Mage_Core_Model_Website the requested website or null if not found
+	 */
+	public function getWebsite($websiteName)
+	{
+		$websiteCollection = Mage::getModel('core/website')->getCollection();
+		$websiteCollection->addFieldToFilter('name',$websiteName);
+		if (count($websiteCollection) > 0)
+		{
+			/** @var Mage_Core_Model_Website $website */
+			$website = $websiteCollection->getFirstItem();
+		}
+		else
+		{
+			$website = null;
+		}
+		return $website;
 	}
 	
 	/**
@@ -131,19 +213,21 @@ Mage_Core_Helper_Abstract
 	}
 	
 	/**
-	 * Returns the category object with the given name. Only looks within the
-	 * specified store.
+	 * Returns the category object with the specified atribute having the
+	 * specified value. Only looks within the specified store.
 	 *
-	 * @param $storeNameRegex the name of the store to look in (regex or exact match)
-	 * @param $name the name of the category to return
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store to return
+	 * @param string $attribute the categry attribute to seach by
+	 * @param string $value the value of $attribute to look for
 	 * @return Mage_Catalog_Model_Category
 	 */
-	public function findCategory($storeNameRegex, $name)
+	protected function findCategory($storeKey, $attribute, $value)
 	{
-		$rootCatId = $this->getStore($storeNameRegex)->getRootCategoryId();
+		$storeGroup = $this->getStore($storeKey);
+		$rootCatId = $storeGroup->getRootCategoryId();
 		
 		$categoriesCollection = Mage::getModel('catalog/category')->getCollection();
-		$categoriesCollection->addAttributeToFilter('name', $name);
+		$categoriesCollection->addAttributeToFilter($attribute, $value);
 		$categoriesCollection->addAttributeToFilter('path', array('like' => '%/'.$rootCatId.'/%'));
 		
 		if (count($categoriesCollection) > 0)
@@ -158,30 +242,28 @@ Mage_Core_Helper_Abstract
 	}
 	
 	/**
-	 * Returns the category object with the given URL key. Only looks within the
+	 * Returns the category object with the given name. Only looks within the
 	 * specified store.
 	 *
-	 * @param $storeNameRegex the name of the store to look in (regex or exact match)
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store to return
 	 * @param $name the name of the category to return
 	 * @return Mage_Catalog_Model_Category
 	 */
-	public function findCategoryByUrlKey($storeNameRegex, $urlKey)
+	public function findCategoryByName($storeKey, $name)
 	{
-		$rootCatId = $this->getStore($storeNameRegex)->getRootCategoryId();
-		
-		$categoriesCollection = Mage::getModel('catalog/category')->getCollection();
-		$categoriesCollection->addAttributeToFilter('url_key', $urlKey);
-		$categoriesCollection->addAttributeToFilter('path', array('like' => '%/'.$rootCatId.'/%'));
-		
-		if (count($categoriesCollection) > 0)
-		{
-			$category = $categoriesCollection->getFirstItem();
-			return $category;
-		}
-		else
-		{
-			return null;
-		}
+		return $this->findCategory($storeKey, 'name', $name);
 	}
 	
+	/**
+	 * Returns the category object with the given URL key. Only looks within the
+	 * specified store.
+	 *
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store to return
+	 * @param $urlKey the URL key of the category to return
+	 * @return Mage_Catalog_Model_Category
+	 */
+	public function findCategoryByUrlKey($storeKey, $urlKey)
+	{
+		return $this->findCategory($storeKey, 'url_key', $urlKey);
+	}	
 }

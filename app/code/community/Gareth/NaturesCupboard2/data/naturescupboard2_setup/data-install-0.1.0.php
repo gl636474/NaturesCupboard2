@@ -19,6 +19,7 @@
 $installer = $this;
 
 $installer->startSetup();
+$installer->enableLogging();
 
 /**
  * Attributes
@@ -214,16 +215,18 @@ $installer->addAttributeToSet($attrib_gmofree, $attribset_food_product);
  **/
 
 $category_root = $installer->addRootCategory('Natures Cupboard Categories June 2016');
+$store = $installer->createNaturesCupboardStore($category_root);
+$installer->setStoreRootCategory($store, $category_root);
 
-$category_food = $installer->addCategory('Food', 'food', $category_root, "We endevour to bring you the healthiest food products - healthy for you, the environment and where appropriate the farmers/producers. Almost all of our range is organic - and where a product isn't there is a joly good reason. Most of our products are certified fairly traded or eco-friendly or both.");
-$category_personal = $installer->addCategory('Personal Care', 'personal-care', $category_root, "Hair and skin products that are as natural an organic as can be. Healthy for you, the environment and where appropriate the farmers/producers. Most of our products are certified fairly traded or eco-friendly or both.");
-$category_baby = $installer->addCategory('Baby', 'baby', $category_root, "Baby products that are as natural an organic as can be. We wouldn't want you to put any product on baby's skin that you wouldn't put in your mouth! Healthy for baby, the environment and where appropriate the farmers/producers. Most of our products are certified fairly traded or eco-friendly or both.");
-$category_household = $installer->addCategory('Household', 'household', $category_root, "Household cleaning products that are as natural an organic as can be. Healthier for you, the environment and where appropriate the farmers/producers. Most of our products are certified fairly traded or eco-friendly or both.", array('meta_title'=>'Household Items'));
+$category_food = $installer->addCategory('Food', $store, 'food', $category_root, "We endevour to bring you the healthiest food products - healthy for you, the environment and where appropriate the farmers/producers. Almost all of our range is organic - and where a product isn't there is a joly good reason. Most of our products are certified fairly traded or eco-friendly or both.");
+$category_personal = $installer->addCategory('Personal Care', $store, 'personal-care', $category_root, "Hair and skin products that are as natural an organic as can be. Healthy for you, the environment and where appropriate the farmers/producers. Most of our products are certified fairly traded or eco-friendly or both.");
+$category_baby = $installer->addCategory('Baby', $store, 'baby', $category_root, "Baby products that are as natural an organic as can be. We wouldn't want you to put any product on baby's skin that you wouldn't put in your mouth! Healthy for baby, the environment and where appropriate the farmers/producers. Most of our products are certified fairly traded or eco-friendly or both.");
+$category_household = $installer->addCategory('Household', $store, 'household', $category_root, "Household cleaning products that are as natural an organic as can be. Healthier for you, the environment and where appropriate the farmers/producers. Most of our products are certified fairly traded or eco-friendly or both.", array('meta_title'=>'Household Items'));
 
-$category_freefrom = $installer->addCategory('Free From', 'free-from', $category_root, "Foods that are free from common allergens: gluten, dairy and sugar.", array('meta_title'=>'Free From Foods'));
-$category_glutenfree = $installer->addCategory('Gluten Free', 'gluten-free', $category_freefrom, "Foods that are certified to be free from gluten and therefore wheat-free too.", array('meta_title'=>'Gluten Free Foods'));
-$category_dairyfree = $installer->addCategory('Dairy Free', 'dairy-free', $category_freefrom, "Foods that are certified to be free from lactose and any dairy product.", array('meta_title'=>'Dairy Free Foods'));
-$category_noaddedsugar = $installer->addCategory('No Added Sugar', 'no-added-sugar', $category_freefrom, "Foods certified to have no added sugar. They may contain naturally occuring sugars contained within their ingredients. We have highlighted any cases where artificial sweeteners have been used.", array('meta_title'=>'Foods with No Added Sugar'));
+$category_freefrom = $installer->addCategory('Free From', $store, 'free-from', $category_root, "Foods that are free from common allergens: gluten, dairy and sugar.", array('meta_title'=>'Free From Foods'));
+$category_glutenfree = $installer->addCategory('Gluten Free', $store, 'gluten-free', $category_freefrom, "Foods that are certified to be free from gluten and therefore wheat-free too.", array('meta_title'=>'Gluten Free Foods'));
+$category_dairyfree = $installer->addCategory('Dairy Free', $store, 'dairy-free', $category_freefrom, "Foods that are certified to be free from lactose and any dairy product.", array('meta_title'=>'Dairy Free Foods'));
+$category_noaddedsugar = $installer->addCategory('No Added Sugar', $store, 'no-added-sugar', $category_freefrom, "Foods certified to have no added sugar. They may contain naturally occuring sugars contained within their ingredients. We have highlighted any cases where artificial sweeteners have been used.", array('meta_title'=>'Foods with No Added Sugar'));
 
 $category_root_id = $category_root->getEntityId();
 $all_products_layout_update = <<<EOT
@@ -237,7 +240,7 @@ $all_products_layout_update = <<<EOT
 </reference>
 EOT;
 
-$installer->addCategory('All', 'all-products', $category_root, "All our products, from sandwich bags to baby shampoo and from cooking oil to gluten free snacks.",
+$installer->addCategory('All', $store, 'all-products', $category_root, "All our products, from sandwich bags to baby shampoo and from cooking oil to gluten free snacks.",
 		array(	'custom_layout_update'=>$all_products_layout_update));
 
 
@@ -261,5 +264,5 @@ $installer->addAttributeToCategoryMapping($attrib_noaddedsugar, $category_noadde
  * Miscellaneous
  */
 $installer->setStoreLogoPath("images/nc_logo.png", "images/nc_logo.png", "The Fairy Door Nature's Cupboard logo");
-
+$installer->setPackageAndTheme('Gareth', 'NaturesCupboard2');
 $installer->endSetup(); 

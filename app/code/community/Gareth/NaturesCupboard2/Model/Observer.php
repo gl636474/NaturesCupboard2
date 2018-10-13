@@ -26,19 +26,9 @@
 class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 {
 	/**
-	 * The group name under which our attributes are listed within the attribute
-	 * sets (group name seen in admin pages only)
-	 *
-	 * @var string
+	 * @var string  $_storeGroupName The name of the Store Group
 	 */
-	private static $_attributeSetGroupName = 'NC Product Info';
-	
-	/**
-	 * A regular expression for the name of the store to which to add
-	 * categories, attributes, etc..
-	 * @var string
-	 */
-	private static $_theStoreRegex = "/nature.?s.*cupboard/i";
+	private static $_storeGroupName = 'Natures Cupboard';
 	
 	/**
 	 * Returns an array of attribute code to category URL key which
@@ -81,7 +71,7 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 				/** @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
 				$lookup= Mage::helper('gareth_naturescupboard2/lookup');
 				/** @var Mage_Catalog_Model_Category $categoryToAddTo */
-				$categoryToAddTo = $lookup->findCategoryByUrlKey(self::$_theStoreRegex, $categoryUrlKeyToAddTo);
+				$categoryToAddTo = $lookup->findCategoryByUrlKey(self::$_storeGroupName, $categoryUrlKeyToAddTo);
 				if (!is_null($categoryToAddTo))
 				{
 					$categoryId = $categoryToAddTo->getId();

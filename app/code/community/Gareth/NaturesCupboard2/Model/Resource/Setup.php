@@ -17,11 +17,6 @@
 
 require_once 'app/Mage.php';
 
-// TODO create store automatically if needed:
-// see https://stackoverflow.com/questions/8309076/how-to-create-a-site-store-and-view-programatically-in-magento
-
-// TODO auto set package and theme-layout, theme-templates, theme-skin,
-// theme-default to this package/module
 
 /**
  * Helper methods for install and upgrade scripts in
@@ -43,6 +38,21 @@ require_once 'app/Mage.php';
  */
 class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resource_Setup
 {
+	/**
+	 * @var string  $_storeGroupName The name of the Store Group
+	 */
+	private static $_storeGroupName = 'Natures Cupboard';
+	
+	/**
+	 * @var string $_storeViewCode The unique code for the Store View.
+	 */
+	private static $_storeViewCode = 'nc_default';
+	
+	/**
+	 * @var string $_storeViewName The name of the Store View
+	 */
+	private static $_storeViewName = 'Default Store View';
+	
 	/**
 	 * A regular expression for the name of the store to which to add
 	 * categories, attributes, etc.. 
@@ -153,10 +163,11 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 * @param $properties array additional properties.
 	 * @return Mage_Catalog_Model_Category the created or updated category
 	 */
-	public function addCategory($name, $url_key = null, $parent = null, $description = null, $properties = null)
+	public function addCategory($name, $store, $url_key = null, $parent = null, $description = null, $properties = null)
 	{
 		/** @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
 		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
+		$storeGroup = $lookup->getStore($store);
 		
 		$defaultProperties = array(
 				'is_active'=>true,
@@ -193,7 +204,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		
 		if (is_null($parent))
 		{
-			$rootCategoryId = $lookup->getStore(self::$_theStoreRegex)->getRootCategoryId();
+			$rootCategoryId = $storeGroup->getRootCategoryId();
 			$parentCategory = Mage::getModel('catalog/category')->load($rootCategoryId);
 		}
 		else if (is_numeric($parent))
@@ -210,20 +221,23 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		}
 		else
 		{
-			$parentCategory = $lookup->findCategory(self::$_theStoreRegex, $parent);
+			$parentCategory = $lookup->findCategoryByName($storeGroup, $parent);
 			if (is_null($parentCategory))
 			{
 				die("addCategory(): Cannot find parent category called: ".$parent);
 			}
 		}
-		
-		$category = $lookup->findCategory(self::$_theStoreRegex, $name);
+		$storeId = $storeGroup->getId();
+		/* @var Mage_Catalog_Model_Category $category */
+		$category = $lookup->findCategoryByName($storeGroup, $name);
 		if (is_null($category))
 		{
 			$exists = false;
 			$category = new Mage_Catalog_Model_Category();
+			$category->setName($name);
 			$category->setPath($parentCategory->getPath());
 			$category->setParentId($parentCategory->getId());
+			$category->setStoreId($storeId);
 		}
 		else
 		{
@@ -233,12 +247,20 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			{
 				$category = $category->move($parentCategory->getId(), null);
 			}
+			
+			// add store ID. Using setStore(id) will throw excpetion if
+			// category is currently in a different store or is in 
+			// multiple stores
+			$storeIds = $storeId;
+			if (!array_key_exists($storeId, $storeIds))
+			{
+				$storeIds[$storeId] = $storeId;
+			}
+			$category->setStoreIds($storeIds);
 		}
-		
-		$category->setName($name);
+
+		// set non-identifying data
 		$category->setUrlKey($url_key);
-		$category->setStoreId($lookup->getStore(self::$_theStoreRegex)->getId());
-		
 		foreach ($combinedProperties as $key=>$value)
 		{
 			$category->setData($key, $value);
@@ -264,10 +286,11 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 * NOTE cannot delete a category if it is set as root category for any
 	 * store - change store root category if no delete button 
 	 *
-	 * @param $name string The plaintext name of the category
+	 * @param string $name The plaintext name of the category
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $store if not null, set the new root category as root category of this store - store must exist
 	 * @return Mage_Catalog_Model_Category the created or updated category
 	 */
-	public function addRootCategory($name)
+	public function addRootCategory($name, $store = null)
 	{
 		// Assume root category names are unique across all stores 
 		/* @var $category Mage_Catalog_Model_Category */
@@ -295,27 +318,47 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			
 			$category->save();
 			Mage::log('Created new root category '.$name, Zend_Log::NOTICE, 'gareth.log');
-		}		
+		}
 		
+		if (!is_null($store))
+		{
+			// setRootCategory handles $store being id/name/object/etc			
+			$this->setStoreRootCategory($store, $category);
+		}
+		
+		return $category;
+	}
+	
+	/**
+	 * Sets the specified store to have the specified category as its root. Does
+	 * nothing if the category is already the store's root category.
+	 * 
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $store
+	 * @param Mage_Catalog_Model_Category $rootCategory the new root category
+	 * @return Mage_Catalog_Model_Category $rootCategory
+	 */
+	public function setStoreRootCategory($store, $rootCategory)
+	{
 		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
 		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
-		/* @var Mage_Core_Model_Store $theStore */
-		$theStore = $lookup->getStore(self::$_theStoreRegex);
-		/* @var Mage_Core_Model_Store_Group $theStore */
-		$theGroup = $theStore->getGroup();
+		/* @var Mage_Core_Model_Store_Group $theGroup */
+		$theGroup = $lookup->getStore($store);
+		
+		$storeName = $theGroup->getName();
+		$categoryName = $rootCategory->getName();
 		
 		$currentRootId = $theGroup->getRootCategoryId();
-		if ($currentRootId != $category->getId())
+		if ($currentRootId != $rootCategory->getId())
 		{
-			$theGroup->setRootCategoryId($category->getId());
+			$theGroup->setRootCategoryId($rootCategory->getId());
 			$theGroup->save();
-			Mage::log('Set store root category to '.$name, Zend_Log::NOTICE, 'gareth.log');
+			Mage::log('Set store '.$storeName.' root category to '.$categoryName, Zend_Log::NOTICE, 'gareth.log');
 		}
 		else
 		{
-			Mage::log('Category: '.$name.' already store root category', Zend_Log::NOTICE, 'gareth.log');
+			Mage::log('Category: '.$categoryName.' already store '.$storeName.' root category', Zend_Log::NOTICE, 'gareth.log');
 		}
-		return $category;
+		return $rootCategory;
 	}
 	
 	/**
@@ -602,7 +645,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		}
 		elseif (is_string($category))
 		{
-			if (is_null($lookup->findCategoryByUrlKey(self::$_theStoreRegex, $category)))
+			if (is_null($lookup->findCategoryByUrlKey(self::$_storeGroupName, $category)))
 			{
 				die("Unknown category ".$category." in addAttributeToCategoryMapping");
 			}
@@ -707,5 +750,124 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		$this->saveConfig('design', $groups_value);
 		
 		Mage::log('Logo set to: '.$logo_path, Zend_Log::NOTICE, 'gareth.log');
+	}
+	
+	/**
+	 * Enables logging to ./var/log.
+	 * 
+	 * @param string $system_log_file defsult log name (defaults to system.log)
+	 * @param string $exceptions_log_file exceptions log name (defaults to exceptions.log)
+	 */
+	public function enableLogging($system_log_file = null, $exceptions_log_file = null)
+	{
+		//create a groups array that has the value we want at the right location
+		$groups_value = array();
+		$groups_value['log']['fields']['active']['value'] = 1;
+		if (!empty($system_log_file))
+		{
+			$groups_value['log']['fields']['file']['value'] = $system_log_file;
+		}
+		if (!empty($exceptions_log_file))
+		{
+			$groups_value['log']['fields']['exception_file']['value'] = $exceptions_log_file;
+		}
+		
+		$this->saveConfig('dev', $groups_value);
+		
+		Mage::log('Logging enabled.', Zend_Log::NOTICE, 'gareth.log');
+	}
+	
+	/**
+	 * Set the currently active package and theme.
+	 * 
+	 * @param string $package Package name, mandatory
+	 * @param string $theme Theme name, mandatory
+	 */
+	public function setPackageAndTheme($package, $theme)
+	{
+		//create a groups array that has the value we want at the right location
+		$groups_value = array();
+		if (!empty($package))
+		{
+			$groups_value['package']['fields']['name']['value'] = $package;
+		}
+		if (!empty($theme))
+		{
+			$groups_value['theme']['fields']['templete']['value'] = $theme;
+			$groups_value['theme']['fields']['skin']['value'] = $theme;
+			$groups_value['theme']['fields']['layout']['value'] = $theme;
+			$groups_value['theme']['fields']['default']['value'] = $theme;
+		}
+		
+		$this->saveConfig('design', $groups_value);
+		
+		Mage::log('Package/Theme set to: '.$package.'/'.$theme, Zend_Log::NOTICE, 'gareth.log');
+	}
+	
+	/**
+	 * Creates the named store if it does not already exist in the specified
+	 * website. If the store already exists, the root category will not be set
+	 * by this function.
+	 * 
+	 * @see https://stackoverflow.com/questions/8309076/how-to-create-a-site-store-and-view-programatically-in-magento
+	 * @param string $name the name of the store to create
+	 * @param Mage_Catalog_Model_Category the root category for the above store
+	 * @param string $websiteName optional name of website
+	 * @return Mage_Core_Model_Store_Group the pre-existing or newly created store
+	 */
+	public function createNaturesCupboardStore($rootCategory, $setAsDefaultStore = true, $websiteName = 'Main Website')
+	{
+		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+		$lookup = Mage::helper('gareth_naturescupboard2/lookup');
+		
+		$website = $lookup->getWebsite($websiteName);
+		if (is_null($website))
+		{
+			die('Cannot find website '.$websiteName.' when creating store '.$name);
+		}
+		
+		$storeGroup = $lookup->getStore(self::$_storeGroupName);
+		if (is_null($storeGroup))
+		{
+			// addStoreGroup
+			/** @var $storeGroup Mage_Core_Model_Store_Group */
+			$storeGroup = Mage::getModel('core/store_group');
+			$storeGroup->setWebsiteId($website->getId())
+				->setName(self::$_storeGroupName)
+				->setRootCategoryId($rootCategory->getId())
+				->save();
+			
+			// addStore
+			/** @var $store Mage_Core_Model_Store */
+			$store = Mage::getModel('core/store');
+			$store->setCode(self::$_storeViewCode)
+				->setWebsiteId($storeGroup->getWebsiteId())
+				->setGroupId($storeGroup->getId())
+				->setName(self::$_storeViewName)
+				->setIsActive(1)
+				->save();
+			
+			Mage::log('Created '.self::$_storeGroupName.' store and view', Zend_Log::NOTICE, 'gareth.log');
+		}
+		else
+		{
+			/** @var $store Mage_Core_Model_Store */
+			$store = Mage::getModel('core/store');
+			$store->load(self::$_storeViewCode, 'code');
+			
+			Mage::log(self::$_storeGroupName.' store already exists', Zend_Log::NOTICE, 'gareth.log');
+		}
+		
+		if ($setAsDefaultStore)
+		{
+			$website->setDefaultGroupId($storeGroup->getId())
+				->save();
+			$storeGroup->setDefaultStoreId($store->getId())
+				->save();
+			
+			Mage::log('Set '.self::$_storeGroupName.' as default store', Zend_Log::NOTICE, 'gareth.log');
+		}
+		
+		return $storeGroup;
 	}
 }
