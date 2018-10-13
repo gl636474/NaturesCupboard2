@@ -15,7 +15,6 @@
  * unauthorised usage of this file or any part thereof.
  */
 
-
 include_once("Mage/Adminhtml/controllers/Catalog/ProductController.php");
 
 /**
@@ -51,14 +50,16 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			'is_household',
 			
 			'is_organic',
-			'is_gluten_free',
-			'is_dairy_free',
 			'is_eco_friendly',
 			'is_vegan',
+			
+			'is_gluten_free',
+			'is_dairy_free',
 			'is_no_added_sugar',
 			'is_raw',
 			'is_preservative_free',
 			'is_gmo_free',
+			
 			'ingredients',
 			
 			'weight',
@@ -69,17 +70,6 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			'short_description',
 			'description',
 	);
-	
-	/**
-	 * Returns the attribute set name given the attribute set ID
-	 */
-	private function getAttributeSetName($setId)
-	{
-		$attributeSetModel = Mage::getModel("eav/entity_attribute_set");
-		$attributeSetModel->load($setId);
-		$attributeSetName  = $attributeSetModel->getAttributeSetName();
-		return $attributeSetName;
-	}
 	
 	/**
 	 * Export product(s) mass action.
@@ -95,21 +85,31 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 		}
 		else
 		{
-			//write headers to the csv file
-			$content = '"sku","qty","is_in_stock"';
-			foreach (self::$fieldsToExport as $field)
-			{
-				$content .= ',"'.$field.'"';
-			}
-			$content .= ',"_attribute_set","_type"'."\n";
-			
 			try
 			{
+				//write headers to the csv file
+				$content = '"sku","qty","is_in_stock"';
+				foreach (self::$fieldsToExport as $field)
+				{
+					$content .= ',"'.$field.'"';
+				}
+				$content .= ',"_attribute_set","_type"'."\n";
+				
+				/** @var Mage_Eav_Model_Config $eavConfig */
+				$eavConfig = Mage::getModel('eav/config');
+				
+				//write data to the csv file
 				foreach ($productIds as $productId)
 				{
+					/** @var Mage_Catalog_Model_Product $product */
 					$product = Mage::getSingleton('catalog/product')->load($productId);
-					$attribSet = $this->getAttributeSetName($product->getAttributeSetId());
+					/** @var Mage_Eav_Model_Entity_Attribute_Set $attributeSetModel */
+					$attributeSet = Mage::getModel("eav/entity_attribute_set")->load($product->getAttributeSetId());
+					/** @var Mage_CatalogInventory_Model_Stock_Item $stock_item */
 					$stock_item = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product);
+					
+					$attributeCodes = $eavConfig->getEntityAttributeCodes(
+						Mage_Catalog_Model_Product::ENTITY, $product);
 					
 					$content .= '"'.$product->getSku().'"';
 					$content .= ',"'.$stock_item->getQty().'"';
@@ -117,12 +117,20 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 					
 					foreach (self::$fieldsToExport as $field)
 					{
-						$data = $product->getData($field);
-						$data = str_replace('"', '\"', $data);
-						$content .= ',"'.$data.'"';
+						if (in_array($field, $attributeCodes))
+						{
+							$data = $product->getData($field);
+							$data = (string)$data;
+							$data = str_replace('"', '\"', $data);
+							$content .= ',"'.$data.'"';
+						}
+						else
+						{
+							$content .= ',';
+						}
 					}
 					
-					$content .= ',"'.$attribSet.'"';
+					$content .= ',"'.$attributeSet->getAttributeSetName().'"';
 					$content .= ',"'.$product->getTypeId().'"';
 					$content .= "\n";
 				}
