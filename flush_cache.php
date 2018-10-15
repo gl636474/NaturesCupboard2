@@ -16,7 +16,8 @@ require_once $magentoDir.'/app/Mage.php';
 // Any files created will have global read-write permissions
 umask(0);
 
-Mage::app('default');
+// specify the store view - must correspond with data-install.php
+Mage::app('nc_default');
 Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 
 try {
