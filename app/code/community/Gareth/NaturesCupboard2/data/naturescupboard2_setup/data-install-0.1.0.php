@@ -143,29 +143,33 @@ $attrib_packagedepth = $installer->addAdminAttribute('package_depth', array(
 		'default' => 0,
 		'required' => true));
 
-$attrib_food = $installer->addAttribute('is_food', array(
+$attrib_food = $installer->addAdminAttribute('is_food', array(
 		'type' => 'int',
 		'input' => 'boolean',
 		'label' => 'Food Product',
-		'required' => true));
+		'required' => false,
+		'default' => false));
 
-$attrib_personal = $installer->addAttribute('is_personal_care', array(
+$attrib_personal = $installer->addAdminAttribute('is_personal_care', array(
 		'type' => 'int',
 		'input' => 'boolean',
 		'label' => 'Personal Care Product',
-		'required' => true));
+		'required' => false,
+		'default' => false));
 
-$attrib_baby = $installer->addAttribute('is_baby', array(
+$attrib_baby = $installer->addAdminAttribute('is_baby', array(
 		'type' => 'int',
 		'input' => 'boolean',
 		'label' => 'Baby Product',
-		'required' => true));
+		'required' => false,
+		'default' => false));
 
-$attrib_household = $installer->addAttribute('is_household', array(
+$attrib_household = $installer->addAdminAttribute('is_household', array(
 		'type' => 'int',
 		'input' => 'boolean',
 		'label' => 'Household Product',
-		'required' => true));
+		'required' => false,
+		'default' => false));
 
 
 		
