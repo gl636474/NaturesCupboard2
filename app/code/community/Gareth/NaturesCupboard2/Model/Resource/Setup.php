@@ -251,7 +251,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			// add store ID. Using setStore(id) will throw excpetion if
 			// category is currently in a different store or is in 
 			// multiple stores
-			$storeIds = $storeId;
+			$storeIds = $category->getStoreIds();
 			if (!array_key_exists($storeId, $storeIds))
 			{
 				$storeIds[$storeId] = $storeId;
