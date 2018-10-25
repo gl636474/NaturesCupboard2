@@ -57,6 +57,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 * A regular expression for the name of the store to which to add
 	 * categories, attributes, etc.. 
 	 * @var string
+	 * @deprecated
 	 */
 	private static $_theStoreRegex = "/nature.?s.*cupboard/i";
 	
