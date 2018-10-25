@@ -870,4 +870,36 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		
 		return $storeGroup;
 	}
+	
+	/**
+	 * Enables or disables a shipping method, identified by it's code. This is
+	 * defined in the carrier class and also under the <groups> tag in
+	 * system.xml.
+	 * 
+	 * @param string $code the code of the shipping method to enable/disable.
+	 * @param boolean $enable whether to enable (true) or disable (false)
+	 */
+	public function enableShippingMethod($code, $enable = true)
+	{
+		//create a groups array that has the value we want at the right location
+		$groups_value = array();
+		if (!empty($code) && is_string($code))
+		{
+			$groups_value[$code]['fields']['active']['value'] = $enable;
+			$this->saveConfig('carriers', $groups_value);
+			
+			if ($enable)
+			{
+				Mage::log('Carrier '.$code.' enabled.', Zend_Log::NOTICE, 'gareth.log');
+			}
+			else
+			{
+				Mage::log('Carrier '.$code.' disabled.', Zend_Log::NOTICE, 'gareth.log');
+			}
+		}
+		else
+		{
+			die('Empty or non-string passed to enableShippingMethod: '.$code);		
+		}
+	}
 }
