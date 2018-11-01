@@ -269,5 +269,6 @@ $installer->addAttributeToCategoryMapping($attrib_noaddedsugar, $category_noadde
  */
 $installer->setStoreLogoPath("images/nc_logo.png", "images/nc_logo.png", "The Fairy Door Nature's Cupboard logo");
 $installer->setPackageAndTheme('Gareth', 'NaturesCupboard2');
-$installer->enableShippingMethod('flatrate', false);
+$installer->enableShippingMethod(null, false);
+$installer->enableShippingMethod('gareth_royalmail');
 $installer->endSetup(); 

@@ -873,34 +873,72 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	}
 	
 	/**
-	 * Enables or disables a shipping method, identified by it's code. This is
-	 * defined in the carrier class and also under the <groups> tag in
-	 * system.xml.
+	 * Returns an array of string which lists all carriers installed, both
+	 * enabled and disabled ones.
 	 * 
-	 * @param string $code the code of the shipping method to enable/disable.
+	 * @return array names of installed carriers.
+	 */
+	protected function getAllShippingMethods()
+	{
+		$carriersConfig = Mage::getStoreConfig('carriers');
+		
+		/* The getStoreConfig() function returns a nested array representing the
+		 * XML but without the <sections> and <groups> tags. */
+		$carriers = array_keys($carriersConfig);
+		return $carriers;
+	}
+	
+	/**
+	 * Enables or disables one or more shipping methods, identified by code.
+	 * These codes are defined in the carrier class and also under the <groups>
+	 * tag in system.xml. If null is passed as the code then all installed
+	 * carriers are enabled/disabled. Non-existent carriers are ignored (but a
+     * log message is generated).
+	 * 
+	 * @param array|string $code the code(s) of the shipping method(s) to enable/disable or null which means all installed carriers.
 	 * @param boolean $enable whether to enable (true) or disable (false)
 	 */
 	public function enableShippingMethod($code, $enable = true)
 	{
-		//create a groups array that has the value we want at the right location
-		$groups_value = array();
-		if (!empty($code) && is_string($code))
+		$allCarriers = $this->getAllShippingMethods();
+		
+		if (is_null($code) || empty($code))
 		{
-			$groups_value[$code]['fields']['active']['value'] = $enable;
-			$this->saveConfig('carriers', $groups_value);
-			
-			if ($enable)
-			{
-				Mage::log('Carrier '.$code.' enabled.', Zend_Log::NOTICE, 'gareth.log');
-			}
-			else
-			{
-				Mage::log('Carrier '.$code.' disabled.', Zend_Log::NOTICE, 'gareth.log');
-			}
+			$carriers = $allCarriers;
+		}
+		elseif (is_string($code))
+		{
+			$carriers = array($code);
 		}
 		else
 		{
-			die('Empty or non-string passed to enableShippingMethod: '.$code);		
+			die('Unknown argument to enableShippingMethod: '.$code.'. Must be string or array of string.');
+		}
+		
+		//create a groups array that has the value we want at the right location
+		$groups_value = array();
+		
+		foreach ($carriers as $carrierCode)
+		{
+			if (in_array($carrierCode, $allCarriers))
+			{
+				$groups_value[$carrierCode]['fields']['active']['value'] = $enable;
+			}
+			else
+			{
+				Mage::log('Carrier '.$carrierCode.' ignored - does not exist.', Zend_Log::INFO, 'gareth.log');
+			}
+		}
+		$this->saveConfig('carriers', $groups_value);
+		
+		$carrierNames = join(', ', $carriers);
+		if ($enable)
+		{
+			Mage::log('Carrier(s) '.$carrierNames.' enabled.', Zend_Log::NOTICE, 'gareth.log');
+		}
+		else
+		{
+			Mage::log('Carrier(s) '.$carrierNames.' disabled.', Zend_Log::NOTICE, 'gareth.log');
 		}
 	}
 }
