@@ -102,9 +102,6 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 		Mage::log('setCategoriesOnProduct called on '.$product->getName(), null, 'gareth.log');
 		
 		$this->setProductCategories($product);
-		
-		// TODO flush cache if made any changes ?
-	
 	} 
 	
 	/**
