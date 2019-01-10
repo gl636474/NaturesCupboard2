@@ -3154,7 +3154,7 @@ body {
   background-position: left top;
   background-clip: border-box;
   background-origin: padding-box;
-  background-size: 100%;
+  background-size: cover, auto;
 }
 
 .wrapper:after {
