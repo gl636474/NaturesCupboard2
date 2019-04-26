@@ -13,6 +13,9 @@
  * the extent permitted by applicable law. You may not copy, modify nor
  * distribute it. The author takes no responsibility for any consequences of
  * unauthorised usage of this file or any part thereof.
+ * 
+ * TODO new logo styling (carry green banner across page)
+ * TODO paypal page styling
  */
 
 /* @var $installer Gareth_NaturesCupboard2_Model_Resource_Setup */
@@ -65,6 +68,14 @@ $attrib_vegan = $installer->addAttribute('is_vegan', array(
 		'required' => true,
 		'position' => 4,
 		'sort_order' => 4));
+
+$attrib_vegetarian = $installer->addAttribute('is_vegetarian', array(
+		'type' => 'int',
+		'input' => 'boolean',
+		'label' => 'Vegetarian',
+		'required' => true,
+		'position' => 5,
+		'sort_order' => 5));
 
 $attrib_noaddedsugar = $installer->addAttribute('is_no_added_sugar', array(
 		'type' => 'int',
@@ -185,6 +196,7 @@ $attribset_product = $installer->addAttributeSet(
 $installer->addAttributeToSet($attrib_organic, $attribset_product);
 $installer->addAttributeToSet($attrib_ecofriendly, $attribset_product);
 $installer->addAttributeToSet($attrib_vegan, $attribset_product);
+$installer->addAttributeToSet($attrib_vegetarian, $attribset_product);
 $installer->addAttributeToSet($attrib_packageheight, $attribset_product);
 $installer->addAttributeToSet($attrib_packagewidth, $attribset_product);
 $installer->addAttributeToSet($attrib_packagedepth, $attribset_product);
@@ -193,6 +205,8 @@ $installer->addAttributeToSet($attrib_food, $attribset_product);
 $installer->addAttributeToSet($attrib_personal, $attribset_product);
 $installer->addAttributeToSet($attrib_baby, $attribset_product);
 $installer->addAttributeToSet($attrib_household, $attribset_product);
+
+$installer->addAttributeToSet($attrib_costprice, $attribset_product);
 
 
 $attribset_product_ingredients = $installer->addAttributeSet(
@@ -267,8 +281,35 @@ $installer->addAttributeToCategoryMapping($attrib_noaddedsugar, $category_noadde
 /**
  * Miscellaneous
  */
-$installer->setStoreLogoPath("images/nc_logo.png", "images/nc_logo.png", "The Fairy Door Nature's Cupboard logo");
-$installer->setPackageAndTheme('Gareth', 'NaturesCupboard2');
+$installer->setStoreLogoPath($store, "images/nc_logo.png", "images/nc_logo.png", "The Fairy Door Nature's Cupboard logo");
+$installer->setPackageAndTheme($store, 'Gareth', 'NaturesCupboard2');
 $installer->enableShippingMethod(null, false);
 $installer->enableShippingMethod('gareth_royalmail');
+$installer->enablePaymentMethod(null, false);
+$installer->enablePaymentMethod('paypal_standard', true);
+
+$config = array(
+	'general/store_information/name' => "Nature's Cupboard",
+	'general/store_information/phone' => '07947 570313',
+	'general/store_information/address' => "13 Deeside Crescent, Aberdeen. AB15 7PT",
+	'design/head/default_title' => "Nature's Cupboard",
+	'design/head/default_description' => 'Bringing you the healthiest foods and household items - healthiest for you, the environment and the farmers/producers.',
+	'design/head/default_keywords' => 'Organic, eco-friendly, fairly traded, fairtrade, vegan, raw, health, food, baby, household, personal care, skin care, hair care, gluten free, dairy free, no added sugar, free from', 
+	'trans_email/ident_general/email' => "jen@naturescupboard.co.uk",
+	'trans_email/ident_general/name' => "Jen @ Nature's Cupbaord",
+	'trans_email/ident_sales/email' => "sales@naturescupboard.co.uk",
+	'trans_email/ident_sales/name' => "Sales @ Nature's Cupbaord",
+	'trans_email/ident_support/email' => "info@naturescupboard.co.uk",
+	'trans_email/ident_support/name' => "Customer Support @ Nature's Cupboard",
+	'contacts/email/recipient_email' => "jen@naturescupboard.co.uk",
+	'catalog/productalert_cron/error_email' => "gareth.ladd@yahoo.co.uk",
+	'sitemap/generate/error_email' => "gareth.ladd@yahoo.co.uk",
+	'shipping/origin/postcode' => 'AB15 7PT',
+	'shipping/origin/city' => 'Aberdeen',
+	'shipping/origin/street_line1' => '13 Deeside Crescent',
+);
+// all other config use defaults
+$installer->setSystemConfig($config, $store);
+
+
 $installer->endSetup(); 

@@ -21,7 +21,7 @@
     <modules>
         <Gareth_NaturesCupboard2>
             <active>true</active>
-            <codePool>community</codePool>
+            <codePool>local</codePool>
             <depends>
                 <Mage_Catalog />
             </depends>

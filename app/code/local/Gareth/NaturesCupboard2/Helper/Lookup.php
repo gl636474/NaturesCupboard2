@@ -38,12 +38,13 @@ Mage_Core_Helper_Abstract
 	}
 	
 	/**
-	 * Returns the store with the specified id/name. Optionally performs a 
-	 * regex match on the name. If no such store exists, returns null.
+	 * Returns the store (i.e. store view) with the specified id/name.
+	 * Optionally performs a regex match on the store's name. If no such store
+	 * exists, returns null.
 	 *
-	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $key the store or group or id or name or name regex of the store to return
-	 * @param boolean $regex whether $storeName is a regular expression matching the name of the store to return
-	 * @return Mage_Core_Model_Store_Group the first store matching $key or null
+	 * @param integer|string|Mage_Core_Model_Store $key the store id or code or name or name regex of the store to return
+	 * @param boolean $regex whether $key is a regular expression matching the name of the store to return
+	 * @return Mage_Core_Model_Store the specified store or null
 	 */
 	public function getStore($key, $regex = false)
 	{
@@ -52,25 +53,84 @@ Mage_Core_Helper_Abstract
 			$store = Mage::app()->getStore($key);
 			if (is_null($store))
 			{
-				$storeGroup = null;
 				Mage::log('Cannot find store with id: '.$key, Zend_Log::NOTICE, 'gareth.log');
-			}
-			else
-			{
-				$storeGroup = $store->getGroup();
 			}
 		}
 		else if (is_string($key))
 		{
 			$found = false;
-			$storeGroup = null;
-			// Mage::app() is Mage_Core_Model_App
-			$allStores = Mage::app()->getStores();
-			foreach ($allStores as $storeId => $store)
+			if (!$found)
 			{
-				$storeGroup = $store->getGroup();
+				// Mage::app() is Mage_Core_Model_App
+				$allStores = Mage::app()->getStores();
+				foreach ($allStores as $storeId => $store)
+				{
+					$storeCode = $store->getCode();
+					$storeViewName = $store->getName();
+					if ($storeCode==$key)
+					{
+						$found = true;
+						break;
+					}
+					elseif ($regex && preg_match($key, $storeViewName))
+					{
+						$found = true;
+						break;
+					}
+					elseif (!$regex && $storeViewName==$key)
+					{
+						$found = true;
+						break;
+					}
+				}
+			}
+			
+			if (!$found)
+			{
+				$store = null;
+				Mage::log('Cannot find store with name: '.$key, Zend_Log::NOTICE, 'gareth.log');
+			}
+			//else $store correctly set in previous for loop
+		}
+		else if ($key instanceof Mage_Core_Model_Store)
+		{
+			$store = $key;
+		}
+		else
+		{
+			$store = null;
+			Mage::log('Unknown argument passed to getStore(): '.$key, Zend_Log::WARN, 'gareth.log');
+		}
+		
+		return $store;
+	}
+	
+	/**
+	 * Returns the store group with the specified id/name. Optionally performs a
+	 * regex match on the group name. If no such group exists, returns null.
+	 *
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $key the group id or name or name regex of the store group to return
+	 * @param boolean $regex whether $key is a regular expression matching the name of the store group to return
+	 * @return Mage_Core_Model_Store_Group the specified store group or null
+	 */
+	public function getStoreGroup($key, $regex = false)
+	{
+		if (is_numeric($key))
+		{
+			$storeGroup = Mage::app()->getGroup($key);
+			if (is_null($storeGroup))
+			{
+				Mage::log('Cannot find store group with id: '.$key, Zend_Log::NOTICE, 'gareth.log');
+			}
+		}
+		else if (is_string($key))
+		{
+			$found = false;
+			// Mage::app() is Mage_Core_Model_App
+			$allGroups = Mage::app()->getGroups();
+			foreach ($allGroups as $groupId => $storeGroup)
+			{
 				$storeGroupName = $storeGroup->getName();
-				$storeViewName = $store->getName();
 				if ($regex && preg_match($key, $storeGroupName))
 				{
 					$found = true;
@@ -82,43 +142,28 @@ Mage_Core_Helper_Abstract
 					break;
 				}
 			}
+			
 			if (!$found)
 			{
-				if ($this->isValidStoreCode($key))
-				{
-					$store = Mage::app()->getStore($key);
-					if (!is_null($store))
-					{
-						$storeGroup = $store->getGroup();
-					}
-					else
-					{
-						$storeGroup = null;
-						Mage::log('Cannot find store with name or code: '.$key, Zend_Log::NOTICE, 'gareth.log');
-					}
-				}
-				else
-				{
-					$storeGroup = null;
-					Mage::log('Cannot find store with name: '.$key, Zend_Log::NOTICE, 'gareth.log');
-				}
+				$storeGroup = null;
+				Mage::log('Cannot find store group with name: '.$key, Zend_Log::NOTICE, 'gareth.log');
 			}
 			//else $storeGroup correctly set in previous for loop
-		}
-		else if ($key instanceof Mage_Core_Model_Store)
-		{
-			$storeGroup = $key->getGroup();
 		}
 		else if ($key instanceof Mage_Core_Model_Store_Group)
 		{
 			$storeGroup = $key;
+		}
+		else if ($key instanceof Mage_Core_Model_Store)
+		{
+			$storeGroup = $key->getGroup();
 		}
 		else
 		{
 			$storeGroup = null;
 			Mage::log('Unknown argument passed to getStore(): '.$key, Zend_Log::WARNING, 'gareth.log');
 		}
-				
+		
 		return $storeGroup;
 	}
 	
@@ -126,7 +171,7 @@ Mage_Core_Helper_Abstract
 	 * Returns the website with the specified name. If no such website exists,
 	 * returns null.
 	 * 
-	 * @param unknown $websiteName the name of the website to return
+	 * @param string $websiteName the name of the website to return
 	 * @return Mage_Core_Model_Website the requested website or null if not found
 	 */
 	public function getWebsite($websiteName)
@@ -223,7 +268,7 @@ Mage_Core_Helper_Abstract
 	 */
 	protected function findCategory($storeKey, $attribute, $value)
 	{
-		$storeGroup = $this->getStore($storeKey);
+		$storeGroup = $this->getStoreGroup($storeKey);
 		$rootCatId = $storeGroup->getRootCategoryId();
 		
 		$categoriesCollection = Mage::getModel('catalog/category')->getCollection();
@@ -246,7 +291,7 @@ Mage_Core_Helper_Abstract
 	 * specified store.
 	 *
 	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store to return
-	 * @param $name the name of the category to return
+	 * @param string $name the name of the category to return
 	 * @return Mage_Catalog_Model_Category
 	 */
 	public function findCategoryByName($storeKey, $name)
@@ -259,7 +304,7 @@ Mage_Core_Helper_Abstract
 	 * specified store.
 	 *
 	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store to return
-	 * @param $urlKey the URL key of the category to return
+	 * @param string $urlKey the URL key of the category to return
 	 * @return Mage_Catalog_Model_Category
 	 */
 	public function findCategoryByUrlKey($storeKey, $urlKey)

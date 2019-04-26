@@ -92,7 +92,6 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 	 * Function called the catalog_product_save_before
 	 * observer configured in config.xml
 	 * 
-	 * @param unknown $observer
 	 */
 	public function setCategoriesOnProduct($observer)
 	{
@@ -108,7 +107,6 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 	 * Function called the catalog_product_import_finish_before
 	 * observer configured in config.xml
 	 *
-	 * @param unknown $observer
 	 */
 	function setCategoriesOnAllProducts($observer)
 	{
