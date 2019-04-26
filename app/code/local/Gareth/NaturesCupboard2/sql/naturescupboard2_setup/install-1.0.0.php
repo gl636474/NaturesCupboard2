@@ -15,6 +15,7 @@
  * unauthorised usage of this file or any part thereof.
  */
 
+/* @var $this Gareth_NaturesCupboard2_Model_Resource_Setup */
 /* @var $installer Gareth_NaturesCupboard2_Model_Resource_Setup */
 $installer = $this;
 
@@ -23,7 +24,7 @@ $installer->startSetup();
 $mappingTableName = $installer->getTable('attribtocategorymapping/attribtocategorymapping');
 
 /* getConnection returns Varien_Db_Adapter_Interface */
-$success = $installer->getConnection()->dropTable($mappingTableName);
+$installer->getConnection()->dropTable($mappingTableName);
 
 /* @var Varien_Db_Ddl_Table $mapping_table */
 $mapping_table = $installer->getConnection()->newTable($mappingTableName);

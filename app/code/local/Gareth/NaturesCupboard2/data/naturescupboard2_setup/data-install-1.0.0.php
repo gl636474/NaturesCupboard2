@@ -18,6 +18,7 @@
  * TODO paypal page styling
  */
 
+/* @var $this Gareth_NaturesCupboard2_Model_Resource_Setup */
 /* @var $installer Gareth_NaturesCupboard2_Model_Resource_Setup */
 $installer = $this;
 

@@ -63,7 +63,8 @@ Mage_Core_Helper_Abstract
 			{
 				// Mage::app() is Mage_Core_Model_App
 				$allStores = Mage::app()->getStores();
-				foreach ($allStores as $storeId => $store)
+				$allStores = array_values($allStores);
+				foreach ($allStores as $store)
 				{
 					$storeCode = $store->getCode();
 					$storeViewName = $store->getName();
@@ -128,7 +129,8 @@ Mage_Core_Helper_Abstract
 			$found = false;
 			// Mage::app() is Mage_Core_Model_App
 			$allGroups = Mage::app()->getGroups();
-			foreach ($allGroups as $groupId => $storeGroup)
+			$allGroups = array_values($allGroups);
+			foreach ($allGroups as $storeGroup)
 			{
 				$storeGroupName = $storeGroup->getName();
 				if ($regex && preg_match($key, $storeGroupName))

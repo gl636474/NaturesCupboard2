@@ -21,7 +21,8 @@ Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 
 try {
     $allTypes = Mage::app()->useCache();
-    foreach($allTypes as $type => $value) {
+    $allTypes = array_keys($allTypes);
+    foreach($allTypes as $type) {
         Mage::app()->getCacheInstance()->cleanType($type);
         Mage::dispatchEvent('adminhtml_cache_refresh_type', array('type' => $type));
         echo "{$type} cache cleared\n";
