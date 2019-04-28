@@ -123,14 +123,6 @@ $attrib_ingredients = $installer->addAttribute('ingredients', array(
  */
 
 
-$attrib_costprice = $installer->addAdminAttribute('cost_price', array(
-		'type' => 'decimal',
-		'input' => 'text',
-		'frontend_class' => 'validate-not-negative-number',
-		'label' => 'Cost Price',
-		'default' => 0,
-		'required' => true));
-
 $attrib_packageheight = $installer->addAdminAttribute('package_height', array(
 		'type' => 'int',
 		'input' => 'text',
@@ -206,8 +198,6 @@ $installer->addAttributeToSet($attrib_food, $attribset_product);
 $installer->addAttributeToSet($attrib_personal, $attribset_product);
 $installer->addAttributeToSet($attrib_baby, $attribset_product);
 $installer->addAttributeToSet($attrib_household, $attribset_product);
-
-$installer->addAttributeToSet($attrib_costprice, $attribset_product);
 
 
 $attribset_product_ingredients = $installer->addAttributeSet(
