@@ -57,10 +57,20 @@ $attrib_dairyfree = $installer->addAttribute('is_dairy_free', array(
 $attrib_ecofriendly = $installer->addAttribute('is_eco_friendly', array(
 		'type' => 'int',
 		'input' => 'boolean',
-		'label' => 'Eco-Friendly',
+		'label' => 'Eco-Friendly features',
 		'required' => true,
 		'position' => 3,
 		'sort_order' => 3));
+
+/** TODO - make three valued: Yes or No or N/A
+$attrib_fairtrade = $installer->addAttribute('is_fairtrade', array(
+    'type' => 'int',
+    'input' => 'boolean',
+    'label' => 'Fairtrade (if applicable)',
+    'required' => true,
+    'position' => 3,
+    'sort_order' => 3));
+*/
 
 $attrib_vegan = $installer->addAttribute('is_vegan', array(
 		'type' => 'int',
