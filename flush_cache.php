@@ -27,6 +27,14 @@ try {
         Mage::dispatchEvent('adminhtml_cache_refresh_type', array('type' => $type));
         echo "{$type} cache cleared\n";
     }
+    
+    echo "Cleaning image cache\n";
+    Mage::getModel('catalog/product_image')->clearCache();
+    
+    echo "Cleaning merged JS/CSS\n";
+    Mage::getModel('core/design_package')->cleanMergedJsCss();
+    Mage::dispatchEvent('clean_media_cache_after');
+    
 } catch (Exception $e) {
     echo $e->getMessage();
 }
