@@ -20,6 +20,6 @@ class Gareth_NaturesCupboard2_Model_Mysql4_AttribToCategoryMapping_Collection ex
     public function _construct()
     {
         parent::_construct();
-        $this->_init('attribtocategorymapping/attribtocategorymapping');
+        $this->_init('gareth_naturescupboard2/attribtocategorymapping');
     }
 }

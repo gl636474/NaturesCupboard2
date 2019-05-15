@@ -191,27 +191,39 @@ Mage_Core_Helper_Abstract
 		}
 		return $website;
 	}
-	
+
 	/**
 	 * Returns the Attribute to Category mapping rule or null if none exists.
 	 *
-	 * @param string $attribute_code the code of the attribute to look for
-	 * @param string $category_url_key the URL of the category to add products to
-	 * @return Gareth_NaturesCupboard2_Model_AttribToCategoryMapping the mapping object or null
+	 * @param string $attribute_code
+	 *        	the code of the attribute to look for
+	 * @param string $category_url_key
+	 *        	the URL of the category to add products to
+	 * @return Gareth_NaturesCupboard2_Model_AttribToCategoryMapping the mapping
+	 *         object or null
 	 */
-	public function findAttributeToCategoryMapping($attribute_code, $category_url_key)
+	public function findAttributeToCategoryMapping ($attribute_code, $category_url_key)
 	{
-		$mappingCollection = Mage::getModel('attribtocategorymapping/attribtocategorymapping')->getCollection();
-		$mappingCollection->addFieldToFilter('attribute_code', $attribute_code);
-		$mappingCollection->addFieldToFilter('category_url_key', $category_url_key);
-		
-		if (count($mappingCollection) > 0)
+		$mappingModel = Mage::getModel('gareth_naturescupboard2/attribtocategorymapping');
+		if (! empty($mappingModel))
 		{
-			$mapping = $mappingCollection->getFirstItem();
-			return $mapping;
+			$mappingCollection = $mappingModel->getCollection();
+			$mappingCollection->addFieldToFilter('attribute_code', $attribute_code);
+			$mappingCollection->addFieldToFilter('category_url_key', $category_url_key);
+
+			if (count($mappingCollection) > 0)
+			{
+				$mapping = $mappingCollection->getFirstItem();
+				return $mapping;
+			}
+			else
+			{
+				return null;
+			}
 		}
 		else
 		{
+			Mage::log('Cannot get model gareth_naturescupboard2/attribtocategorymapping', Zend_Log::ERR, 'gareth.log');
 			return null;
 		}
 	}

@@ -25,18 +25,19 @@
     </modules>
     <global>
         <models>
-            <attribtocategorymapping>
+          <!-- This tag is the pre-slash part of the model identifier -->
+            <gareth_naturescupboard2>
                 <class>Gareth_NaturesCupboard2_Model</class>
-                <resourceModel>attribtocategorymapping_mysql4</resourceModel>
-            </attribtocategorymapping>
-            <attribtocategorymapping_mysql4>
+                <resourceModel>gareth_naturescupboard2_mysql4</resourceModel>
+            </gareth_naturescupboard2>
+            <gareth_naturescupboard2_mysql4>
                 <class>Gareth_NaturesCupboard2_Model_Mysql4</class>
                 <entities>
                     <attribtocategorymapping>
                         <table>naturescupboard2_attribtocategorymapping</table>
                     </attribtocategorymapping>
                 </entities>
-            </attribtocategorymapping_mysql4>
+            </gareth_naturescupboard2_mysql4>
         </models>
         <resources>
             <naturescupboard2_setup>

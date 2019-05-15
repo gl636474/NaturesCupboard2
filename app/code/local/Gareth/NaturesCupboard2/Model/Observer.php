@@ -38,7 +38,7 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 	protected function getAttributeCodeToCategoryUrlKeyMapping()
 	{
 		$mappings = array();
-		$model = Mage::getModel('attribtocategorymapping/attribtocategorymapping');
+		$model = Mage::getModel('gareth_naturescupboard2/attribtocategorymapping');
 		$mappingCollection = $model->getCollection();
 		/* @var Gareth_NaturesCupboard2_Model_AttribToCategoryMapping $thisMapping */
 		foreach ($mappingCollection as $thisMapping)

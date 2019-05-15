@@ -20,6 +20,6 @@ class Gareth_NaturesCupboard2_Model_Mysql4_AttribToCategoryMapping extends Mage_
     public function _construct()
     {    
         // Note that the id refers to the key field in your database table.
-        $this->_init('attribtocategorymapping/attribtocategorymapping', 'id');
+        $this->_init('gareth_naturescupboard2/attribtocategorymapping', 'id');
     }
 }

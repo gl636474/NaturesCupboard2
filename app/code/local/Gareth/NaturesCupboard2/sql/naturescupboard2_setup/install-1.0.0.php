@@ -21,7 +21,7 @@ $installer = $this;
 
 $installer->startSetup();
 
-$mappingTableName = $installer->getTable('attribtocategorymapping/attribtocategorymapping');
+$mappingTableName = $installer->getTable('gareth_naturescupboard2/attribtocategorymapping');
 
 /* getConnection returns Varien_Db_Adapter_Interface */
 $installer->getConnection()->dropTable($mappingTableName);
