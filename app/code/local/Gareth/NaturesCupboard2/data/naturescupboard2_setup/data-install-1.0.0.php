@@ -310,7 +310,7 @@ $config = array(
 	'shipping/origin/street_line1' => '13 Deeside Crescent',
 );
 // all other config use defaults
-$installer->setSystemConfig($config, $store);
+$installer->setSystemConfig($config, $store, true);
 
 
 $installer->endSetup(); 

@@ -301,7 +301,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			'general/country/allow' => 'GB',
 			//'general/country/eu_countries' => 'GB', // use magento default - does not impact any other sys conf values
 			'general/country/optional_zip_countries' => 'HK,IE,MO,PA', // Postal Code is Optional for these countries
-			'general/store_information/merchant_country' => GB,
+			'general/store_information/merchant_country' => 'GB',
 			'general/region/state_required' => 'AT,CA,EE,FI,FR,DE,LV,LT,RO,ES,CH,US',
 			'tax/defaults/country' => 'GB',
 			'shipping/origin/country_id' => 'GB',
@@ -923,29 +923,6 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	}
 	
 	/**
-	 * Returns the code of the specified store, returning null if null or
-	 * invalid value is passed
-	 * @param mixed $store the store to return the code of, can be null
-	 * @return null|string the store code of $store
-	 */
-	protected function getStoreCode($store)
-	{
-		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
-		$lookup = Mage::helper('gareth_naturescupboard2/lookup');
-		
-		$store = $lookup->getStore($store);
-		if (!is_null($store))
-		{
-			$store_code = $store->getCode();
-		}
-		else
-		{
-			$store_code = null;
-		}
-		return $store_code;
-	}
-	
-	/**
 	 * Save a configuration change - as would be made via the 
 	 * System->Configuration admin menu option.
 	 * 
@@ -961,9 +938,23 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 * 
 	 * @param string $section the section as per the links on the left hand side of the admin System Config page
 	 * @param array $groups_value a multidimantional array specifying group, field and value
+	 * @param integer|string|Mage_Core_Model_Store $key the store id or code or name of the store to set config of
 	 */
-	protected function saveConfig($section, $groups_values, $website_code = null, $store_code = null)
+	protected function saveConfig($section, $groups_values, $website_code = null, $store = null)
 	{
+		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+		$lookup = Mage::helper('gareth_naturescupboard2/lookup');
+		
+		if (!is_null($store))
+		{
+			$store = $lookup->getStore($store);
+			$storeCode = $store->getCode();
+		}
+		else
+		{
+			$storeCode = null;
+		}
+		
 		if (!empty($section) && !empty($groups_values))
 		{
 			// Set website and store to null to set the
@@ -975,7 +966,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			$config_data = Mage::getModel('adminhtml/config_data');
 			$config_data->setSection($section)
 				->setWebsite($website_code)
-				->setStore($store_code)
+				->setStore($storeCode)
 				->setGroups($groups_values)
 				->save();
 		}
@@ -1008,8 +999,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			$groups_value['header']['fields']['logo_alt']['value'] = $alt_text;
 		}
 		
-		$store_code = $this->getStoreCode($store);
-		$this->saveConfig('design', $groups_value, null, $store_code);
+		$this->saveConfig('design', $groups_value, null, $store);
 		
 		Mage::log('Logo set to: '.$logo_path, Zend_Log::NOTICE, 'gareth.log');
 	}
@@ -1062,8 +1052,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			$groups_value['theme']['fields']['default']['value'] = $theme;
 		}
 		
-		$store_code = $this->getStoreCode($store);
-		$this->saveConfig('design', $groups_value, null, $store_code);
+		$this->saveConfig('design', $groups_value, null, $store);
 		
 		Mage::log('Package/Theme set to: '.$package.'/'.$theme, Zend_Log::NOTICE, 'gareth.log');
 	}
@@ -1358,7 +1347,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 * @param callable $converter a function taking one argument which will clean the values in the $user_values array.
 	 * @return array $defaults but including any valid values in $user_values 
 	 */
-	protected function combineDefaultsAndUserValues(array $defaults, array $user_values, callable $converter, bool $useDefaults)
+	protected function combineDefaultsAndUserValues(array $defaults, array $user_values, callable $converter, $useDefaults)
 	{
 		$joinedArrays = array();
 		foreach ($defaults as $defaultKey=>$defaultValue)
@@ -1568,7 +1557,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 * @param array $path_values and array of path to value. E.g. array('general/country/default'=>'GB')
 	 * @param $useDefaults string whether to set default values for configs not specified in $path_values
 	 */
-	public function setSystemConfig($path_values, $useDefaults)
+	public function setSystemConfig($path_values, $store, $useDefaults = false)
 	{
 		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
 		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
