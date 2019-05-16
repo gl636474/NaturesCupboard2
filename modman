@@ -5,8 +5,11 @@ app/design/frontend/Gareth/NaturesCupboard2  app/design/frontend/Gareth/NaturesC
 skin/frontend/Gareth/NaturesCupboard2        skin/frontend/Gareth/NaturesCupboard2
 app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupboard2.xml
 
-# Create log dir
+# Create logs - Magento 1.9.4.x needs these files to already exist
 @shell mkdir $PROJECT/var/log
+@shell touch $PROJECT/var/log/system.log
+@shell touch $PROJECT/var/log/gareth.log
+@shell touch $PROJECT/var/log/exception.log
 
 # Clear all caches
 @shell rm -rf "$PROJECT/var/cache"
@@ -22,4 +25,7 @@ app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupbo
 @shell echo ""
 @shell echo "Run the following to enable exception traces:"
 @shell echo "    cp errors/local.xml.sample errors/local.xml"
+@shell echo ""
+@shell echo "Also ensure the log files are writable by the webserver:"
+@shell echo "    var/log/*"
 
