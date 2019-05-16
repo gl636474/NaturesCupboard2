@@ -51,7 +51,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	/**
 	 * @var string $_storeViewName The name of the Store View
 	 */
-	private static $_storeViewName = 'Default Store View';
+	private static $_storeViewName = 'Natures Cupboard Store View';
 	
 	/**
 	 * A regular expression for the name of the store to which to add
