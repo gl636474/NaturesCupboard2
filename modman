@@ -6,10 +6,10 @@ skin/frontend/Gareth/NaturesCupboard2        skin/frontend/Gareth/NaturesCupboar
 app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupboard2.xml
 
 # Create logs - Magento 1.9.4.x needs these files to already exist
-@shell mkdir $PROJECT/var/log
-@shell touch $PROJECT/var/log/system.log
-@shell touch $PROJECT/var/log/gareth.log
-@shell touch $PROJECT/var/log/exception.log
+@shell mkdir "$PROJECT/var/log"
+@shell touch "$PROJECT/var/log/system.log"
+@shell touch "$PROJECT/var/log/gareth.log"
+@shell touch "$PROJECT/var/log/exception.log"
 
 # Clear all caches
 @shell rm -rf "$PROJECT/var/cache"
