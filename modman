@@ -11,6 +11,14 @@ app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupbo
 @shell touch "$PROJECT/var/log/gareth.log"
 @shell touch "$PROJECT/var/log/exception.log"
 
+# Set global read permissions on static files (CSS/Javascript)
+@shell chmod -R a+r "$PROJECT/js"
+@shell chmod -R a+X "$PROJECT/js"
+@shell chmod -R a+r "$PROJECT/skin"
+@shell chmod -R a+X "$PROJECT/skin"
+@shell chmod -R a+r "$PROJECT/media"
+@shell chmod -R a+X "$PROJECT/media"
+
 # Clear all caches
 @shell rm -rf "$PROJECT/var/cache"
 @shell rm -rf "$PROJECT/var/session"
