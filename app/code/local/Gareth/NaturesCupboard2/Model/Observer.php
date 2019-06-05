@@ -57,28 +57,40 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 		$mappings = $this->getAttributeCodeToCategoryUrlKeyMapping();
 		$product_attributes = $product->getAttributes();//self::$_attributeSetGroupName, false);
 
-		$categoryIds = array();
+		$categoryIds = $product->getCategoryIds();
 		/* @var Mage_Catalog_Model_Resource_Eav_Attribute $thisAttribute */
 		foreach ($product_attributes as $thisAttribute)
 		{
 			$thisAttributeCode = $thisAttribute->getAttributeCode();
 			$thisAttributeIsMapped = array_key_exists($thisAttributeCode, $mappings);
-			$thisAttributeIsTrue = $product->getData($thisAttributeCode);
-			if ($thisAttributeIsMapped && $thisAttributeIsTrue)
+			if ($thisAttributeIsMapped)
 			{
-				$categoryUrlKeyToAddTo = $mappings[$thisAttributeCode];
-				
+				$categoryUrlKey = $mappings[$thisAttributeCode];			
 				/** @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
 				$lookup= Mage::helper('gareth_naturescupboard2/lookup');
 				/** @var Mage_Catalog_Model_Category $categoryToAddTo */
-				$categoryToAddTo = $lookup->findCategoryByUrlKey(self::$_storeGroupName, $categoryUrlKeyToAddTo);
-				if (!is_null($categoryToAddTo))
+				$mappedCategory = $lookup->findCategoryByUrlKey(self::$_storeGroupName, $categoryUrlKey);
+				$mappedCategoryId = $mappedCategory->getId();
+				
+				if (!is_null($mappedCategory))
 				{
-					$categoryId = $categoryToAddTo->getId();
-					
-					$parentCategoryIds = $categoryToAddTo->getParentIds();
-					$categoryIds[] = $categoryId;
-					$categoryIds = array_merge($categoryIds, $parentCategoryIds);
+					$thisAttributeIsTrue = $product->getData($thisAttributeCode);
+					if ($thisAttributeIsTrue)
+					{
+						// add the mapped category and all ancestors to this product
+						$categoryIds[] = $mappedCategoryId;
+						
+						$parentCategoryIds = $mappedCategory->getParentIds();
+						$categoryIds = array_merge($categoryIds, $parentCategoryIds);
+					}
+					else
+					{
+						// remove the mapped category and all descendents from this product
+						// getAllChilren returns mappedCategory ID also. true = as array
+						$childCategoryIdsToRemove = $mappedCategory->getAllChildren(true);
+						// returns $array1 having removed all elements from $array2
+						$categoryIds =array_diff($categoryIds, $childCategoryIdsToRemove);
+					}
 				}
 			}
 		}
