@@ -197,13 +197,16 @@ Mage_Core_Helper_Abstract
 	 *
 	 * @param string $attribute_code
 	 *        	the code of the attribute to look for
-	 * @param string $category_url_key
-	 *        	the URL of the category to add products to
+	 * @param string $category
+	 *        	the URL, ID, name or instance of the category to add products to
 	 * @return Gareth_NaturesCupboard2_Model_AttribToCategoryMapping the mapping
 	 *         object or null
 	 */
-	public function findAttributeToCategoryMapping ($attribute_code, $category_url_key)
+	public function findAttributeToCategoryMapping ($attribute_code, $category)
 	{
+		$category = $this->findCategory($storeKey, $key)
+		// TODO update to use category ID instead
+		// TODO also update Setup add/remove...Mapping()
 		$mappingModel = Mage::getModel('gareth_naturescupboard2/attribtocategorymapping');
 		if (! empty($mappingModel))
 		{
@@ -272,6 +275,67 @@ Mage_Core_Helper_Abstract
 	}
 	
 	/**
+	 * Returns the category object with the specified ID. Only looks within the
+	 * specified store.
+	 *
+	 * @param integer $id the ID of the category to return
+	 * @return Mage_Catalog_Model_Category
+	 */
+	public function findCategoryById($id)
+	{
+		if (is_numeric($id))
+		{
+			$category = Mage::getModel('catalog/category')->load($id);
+			if (!empty($category) && !empty($category->getId()))
+			{
+				return $category;
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else 
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the specified category object. Only looks within the specified
+	 * store. Categories can be looked up by ID or string (URL-Key or name).If a
+	 * Mage_Catalog_Model_Category is passed in ti is returned.
+	 *
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store to return
+	 * @param integer|string|Mage_Catalog_Model_Category $key the category ID/URL-Key/name/instance of the category to return
+	 * @return Mage_Catalog_Model_Category
+	 */
+	public function findCategory($storeKey, $key)
+	{
+		if (is_numeric($key))
+		{
+			return $this->findCategoryById($key);
+		}
+		elseif (is_string($key))
+		{
+			$category = $this->findCategoryByUrlKey($storeKey, $key);
+			if (empty($category))
+			{
+				$category = $this->findCategoryByName($storeKey, $key);
+			}
+			return $category;
+		}
+		elseif ($key instanceof Mage_Catalog_Model_Category)
+		{
+			return $key;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
 	 * Returns the category object with the specified atribute having the
 	 * specified value. Only looks within the specified store.
 	 *
@@ -280,7 +344,7 @@ Mage_Core_Helper_Abstract
 	 * @param string $value the value of $attribute to look for
 	 * @return Mage_Catalog_Model_Category
 	 */
-	protected function findCategory($storeKey, $attribute, $value)
+	protected function findCategoryByAttribute($storeKey, $attribute, $value)
 	{
 		$storeGroup = $this->getStoreGroup($storeKey);
 		$rootCatId = $storeGroup->getRootCategoryId();
@@ -310,7 +374,7 @@ Mage_Core_Helper_Abstract
 	 */
 	public function findCategoryByName($storeKey, $name)
 	{
-		return $this->findCategory($storeKey, 'name', $name);
+		return $this->findCategoryByAttribute($storeKey, 'name', $name);
 	}
 	
 	/**
@@ -323,6 +387,6 @@ Mage_Core_Helper_Abstract
 	 */
 	public function findCategoryByUrlKey($storeKey, $urlKey)
 	{
-		return $this->findCategory($storeKey, 'url_key', $urlKey);
+		return $this->findCategoryByAttribute($storeKey, 'url_key', $urlKey);
 	}	
 }

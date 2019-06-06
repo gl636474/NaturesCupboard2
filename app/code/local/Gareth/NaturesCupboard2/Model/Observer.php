@@ -26,81 +26,6 @@
 class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 {
 	/**
-	 * @var string  $_storeGroupName The name of the Store Group
-	 */
-	private static $_storeGroupName = 'Natures Cupboard';
-	
-	/**
-	 * Returns an array of attribute code to category URL key which
-	 * represents the categories to which products should be added to if the
-	 * product has the specified attribute set to true.
-	 */
-	protected function getAttributeCodeToCategoryUrlKeyMapping()
-	{
-		$mappings = array();
-		$model = Mage::getModel('gareth_naturescupboard2/attribtocategorymapping');
-		$mappingCollection = $model->getCollection();
-		/* @var Gareth_NaturesCupboard2_Model_AttribToCategoryMapping $thisMapping */
-		foreach ($mappingCollection as $thisMapping)
-		{
-			$attributeCode = $thisMapping->getAttributeCode();
-			$categoryUrlKey = $thisMapping->getCategoryUrlKey();
-			
-			$mappings[$attributeCode] = $categoryUrlKey;
-		}
-		return $mappings;
-	}
-	
-	protected function setProductCategories($product)
-	{
-		$productName = $product->getName();
-		$mappings = $this->getAttributeCodeToCategoryUrlKeyMapping();
-		$product_attributes = $product->getAttributes();//self::$_attributeSetGroupName, false);
-
-		$categoryIds = $product->getCategoryIds();
-		/* @var Mage_Catalog_Model_Resource_Eav_Attribute $thisAttribute */
-		foreach ($product_attributes as $thisAttribute)
-		{
-			$thisAttributeCode = $thisAttribute->getAttributeCode();
-			$thisAttributeIsMapped = array_key_exists($thisAttributeCode, $mappings);
-			if ($thisAttributeIsMapped)
-			{
-				$categoryUrlKey = $mappings[$thisAttributeCode];			
-				/** @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
-				$lookup= Mage::helper('gareth_naturescupboard2/lookup');
-				/** @var Mage_Catalog_Model_Category $categoryToAddTo */
-				$mappedCategory = $lookup->findCategoryByUrlKey(self::$_storeGroupName, $categoryUrlKey);
-				$mappedCategoryId = $mappedCategory->getId();
-				
-				if (!is_null($mappedCategory))
-				{
-					$thisAttributeIsTrue = $product->getData($thisAttributeCode);
-					if ($thisAttributeIsTrue)
-					{
-						// add the mapped category and all ancestors to this product
-						$categoryIds[] = $mappedCategoryId;
-						
-						$parentCategoryIds = $mappedCategory->getParentIds();
-						$categoryIds = array_merge($categoryIds, $parentCategoryIds);
-					}
-					else
-					{
-						// remove the mapped category and all descendents from this product
-						// getAllChilren returns mappedCategory ID also. true = as array
-						$childCategoryIdsToRemove = $mappedCategory->getAllChildren(true);
-						// returns $array1 having removed all elements from $array2
-						$categoryIds =array_diff($categoryIds, $childCategoryIdsToRemove);
-					}
-				}
-			}
-		}
-		
-		$categoryIds = array_unique($categoryIds);
-		$product->setCategoryIds($categoryIds);
-		Mage::log('Product '.$productName.' re-assigned categories: '.implode(',',$categoryIds), null, 'gareth.log');
-	}
-	
-	/**
 	 * Function called the catalog_product_save_before
 	 * observer configured in config.xml
 	 * 
@@ -112,7 +37,9 @@ class Gareth_NaturesCupboard2_Model_Observer extends Varien_Object
 		
 		Mage::log('setCategoriesOnProduct called on '.$product->getName(), null, 'gareth.log');
 		
-		$this->setProductCategories($product);
+		/** @var Gareth_NaturesCupboard2_Helper_Product $productHelper */
+		$productHelper = Mage::helper('gareth_naturescupboard2/product');
+		$productHelper->setCategoriesFromAttributes($product);
 	} 
 	
 	/**

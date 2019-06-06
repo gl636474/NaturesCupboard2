@@ -885,6 +885,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 			die("addAttributeToCategoryMapping(): Invalid category: ".$category);
 		}
 		
+		// TODO use ID instead
 		$attrib_category_mapping= $lookup->findAttributeToCategoryMapping($attribute_code, $category_url_key);
 		if (is_null($attrib_category_mapping))
 		{
@@ -911,6 +912,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	 */
 	public function removeAttributeToCategoryMapping($attribute_code, $category_url_key)
 	{
+		// TODO update to use ID instead
 		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
 		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
 		

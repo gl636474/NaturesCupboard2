@@ -15,6 +15,21 @@
  * unauthorised usage of this file or any part thereof.
  */
 
+/**
+ * Maps a product attribute to a category. The intention is that if the
+ * attribute value is true then the product should be added to the category.
+ * 
+ * Since v1.0.1, categories are now mapped by ID not their URL-key
+ * 
+ * @author gareth
+ *
+ * @method string getAttributeCode() get the code of the mapped attribute
+ * @method void setAttributeCode(string) set the code of the mapped attribute
+ * @method string getCategoryUrlKey() get the url-key of the mapped category (deprecated, ignored)
+ * @method void setCategoryUrlKey(string) set the url-key of the mapped category (deprecated, ignored)
+ * @method integer getCategoryId() get the ID of the mapped category
+ * @method void setCategoryId(integer) set the ID of the mapped category
+ */
 class Gareth_NaturesCupboard2_Model_AttribToCategoryMapping extends Mage_Core_Model_Abstract
 {
     public function _construct()
