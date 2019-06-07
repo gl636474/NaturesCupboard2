@@ -144,4 +144,51 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			$this->_prepareDownloadResponse('natures_cupboard_products.csv', $content, 'text/csv');
 		}
 	}
+	
+	/**
+	 * Export cost sheet for product(s) action.
+	 *
+	 * @author Gareth
+	 */
+	public function pricingSheetAction()
+	{
+		$productIds = $this->getRequest()->getParam('product');
+		if (!is_array($productIds)) {
+			$this->_getSession()->addError($this->__('Please select product(s).'));
+			$this->_redirect('*/*/index');
+		}
+		else
+		{
+			try
+			{
+				//write headers to the csv file
+				$content = '"Product","Price per unit","Quantity","Total Price"'."\n";
+
+				//write data to the csv file
+				foreach ($productIds as $productId)
+				{
+					/** @var Mage_Catalog_Model_Product $product */
+					$product = Mage::getSingleton('catalog/product')->load($productId);
+					
+					$content .= '"'.$product->getName().'",';
+					$content .= '"'.$product->getPrice().'",';
+					$content .= '"",""'; //empty cols for qantity and total price
+					$content .= "\n";
+				}
+				
+				$content .= '"","","",""'."\n"; // blank line
+				$content .= '"Grand Total","--->","--->",""'."\n"; // footer
+			}
+			catch (Exception $e)
+			{
+				$this->_getSession()->addError($e->getMessage());
+				$this->_redirect('*/*/index');
+			}
+			
+			$date = date('d_m_Y');
+			$filename = 'natures_cupboard_prices_'.$date.'.csv';
+			$this->_prepareDownloadResponse($filename, $content, 'text/csv');
+		}
+	}
+	
 }

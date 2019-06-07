@@ -67,6 +67,11 @@ class Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid extends Mage_
 				'label'=> Mage::helper('catalog')->__('Export to CSV'),
 				'url'  => $this->getUrl('*/*/massExport')
 		));
+
+		$this->getMassactionBlock()->addItem('pricing', array(
+				'label'=> Mage::helper('catalog')->__('Export pricing sheet'),
+				'url'  => $this->getUrl('*/*/pricingSheet')
+		));
 		// End of section added by Gareth
 		
 		
