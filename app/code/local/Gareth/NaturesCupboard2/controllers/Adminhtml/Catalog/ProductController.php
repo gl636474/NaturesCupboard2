@@ -40,6 +40,7 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			'status',
 			'price',
 			'name',
+			'cost',
 			'tax_class_id',
 			'url_key',
 			'visibility',

@@ -592,6 +592,72 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	}
 	
 	/**
+	 * 
+	 * @param integer|string|Mage_Eav_Model_Entity_Attribute $attribute the ID, code or instance of the attribute to edit 
+	 * @param string $property the name of the property of $attribute to set
+	 * @param mixed $value the value to set $property to
+	 * @return Mage_Eav_Model_Attribute the edited attribute or null if not found or property does not exist
+	 */
+	public function editAttribute($key, $property, $value)
+	{
+		// We deal with PRODUCT attributes
+		$entityTypeId = Mage::getModel('catalog/product')->getResource()->getTypeId();
+		/* @var $eavSetup Mage_Catalog_Model_Resource_Eav_Mysql4_Setup */
+		$eavSetup = $this->_getEavSetup();
+		
+		/* @var Mage_Eav_Model_Attribute $attribute */
+		if ($key instanceof Mage_Eav_Model_Attribute)
+		{
+			$attribute = $eavSetup->getAttribute($entityTypeId, $key->getAttributeId());;
+			$attributeCode = $attribute->getAttributeCode();
+		}
+		elseif (is_numeric($key) || is_string($key))
+		{
+			$attribute = $eavSetup->getAttribute($entityTypeId, $key);
+			if (is_null($attribute))
+			{
+				Mage::log('Cannot find Attribute '.$key.' to edit', Zend_Log::NOTICE, 'gareth.log');
+				return null;
+			}
+			else
+			{
+				$attributeCode = $attribute['attribute_code'];
+			}
+		}
+		else
+		{
+			Mage::log('Invalid argument to editAttribute: '.$key, Zend_Log::NOTICE, 'gareth.log');
+			return null;
+		}
+		
+		if ($value === true)
+		{
+			$value = "1";
+		}
+		if ($value === false)
+		{
+			$value = "0";
+		}
+		
+		if (array_key_exists($property, $attribute))
+		{
+			$eavSetup->updateAttribute($entityTypeId, $attributeCode, $property, $value);
+			
+			/* @var $model Mage_Eav_Model_Entity_Attribute */
+			$model = Mage::getModel('eav/entity_attribute');
+			$model->loadByCode($entityTypeId, $attributeCode);
+			
+			Mage::log('Edited Attribute '.$attributeCode.' set property '.$property.' to: '.$value, Zend_Log::NOTICE, 'gareth.log');
+			return $model;
+		}
+		else
+		{
+			Mage::log('Cannot edit Attribute '.$attributeCode.' because property '.$property.' does not exist', Zend_Log::NOTICE, 'gareth.log');
+			return null;
+		}
+	}
+	
+	/**
 	 * Add attribute or updates existing attribute with the given name. Required
 	 * keys in the properties array are:
 	 *   * type - string SQL type in table
