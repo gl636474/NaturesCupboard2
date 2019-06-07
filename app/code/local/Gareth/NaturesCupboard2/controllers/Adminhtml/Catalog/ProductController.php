@@ -52,6 +52,7 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			'is_organic',
 			'is_eco_friendly',
 			'is_vegan',
+			'is_vegetarian',
 			
 			'is_gluten_free',
 			'is_dairy_free',
@@ -121,7 +122,7 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 						{
 							$data = $product->getData($field);
 							$data = (string)$data;
-							$data = str_replace('"', '\"', $data);
+							$data = str_replace('"', '""', $data);
 							$content .= ',"'.$data.'"';
 						}
 						else
