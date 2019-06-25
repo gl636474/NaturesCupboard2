@@ -28,6 +28,8 @@ app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupbo
 #
 @shell php "$MODULE/flush_cache.php" --mage-dir="$PROJECT"
 
+@shell sh "$MODULE/check_htaccess.sh" "$PROJECT"
+
 @shell echo "Ensure modman update/deploy was run with --copy --force otherwise Magento may"
 @shell echo "not pick up the extension/changes"
 @shell echo ""
