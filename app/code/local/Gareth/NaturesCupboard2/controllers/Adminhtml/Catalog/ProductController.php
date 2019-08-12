@@ -41,6 +41,8 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 			'price',
 			'name',
 			'cost',
+			'margin_pounds',
+			'margin_percent',
 			'tax_class_id',
 			'url_key',
 			'visibility',
@@ -147,7 +149,9 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 	}
 	
 	/**
-	 * Export cost sheet for product(s) action.
+	 * Export cost sheet for product(s) action. This is a spreadsheet for manual
+	 * orders, containing product name, price and empty columns for quantity to
+	 * order and total price.
 	 *
 	 * @author Gareth
 	 */
@@ -192,4 +196,73 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 		}
 	}
 	
+	/**
+	 * Export cost and margins sheet for product(s) action. This is a
+	 * spreadsheet for store owner to see product name, selling price, cost
+	 * price and margin (in £s and %) for each product.
+	 *
+	 * @author Gareth
+	 */
+	public function marginsSheetAction()
+	{
+		$productIds = $this->getRequest()->getParam('product');
+		if (!is_array($productIds)) {
+			$this->_getSession()->addError($this->__('Please select product(s).'));
+			$this->_redirect('*/*/index');
+		}
+		else
+		{
+			try
+			{
+				/** @var Gareth_NaturesCupboard2_Helper_Constants $constants */
+				$constants = Mage::helper('gareth_naturescupboard2/constants');
+				/** @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+				$lookup = Mage::helper('gareth_naturescupboard2/lookup');
+				
+				$storeCode = $constants->getNCStoreViewCode();
+				$store = $lookup->getStore($storeCode);
+				
+				//write headers to the csv file
+				$content = '"SKU","Product","Price per unit","Cost Price","Margin (£)","Margin (%)"'."\n";
+
+				//write data to the csv file
+				foreach ($productIds as $productId)
+				{
+					/** @var Mage_Catalog_Model_Resource_Product $resource */
+					$resource = Mage::getSingleton('catalog/product')->getResource();
+					
+					$sku = $resource->getAttributeRawValue($productId, 'sku', $store);
+					$name = $resource->getAttributeRawValue($productId, 'name', $store);
+					
+					$price = $resource->getAttributeRawValue($productId, 'price', $store);
+					$cost = $resource->getAttributeRawValue($productId, 'cost', $store);
+					$margin_pounds = $resource->getAttributeRawValue($productId, 'margin_pounds', $store);
+					$margin_percent = $resource->getAttributeRawValue($productId, 'margin_percent', $store);
+					
+					$price = is_numeric($price) ? round($price,2) : "";
+					$cost = is_numeric($cost) ? round($cost,2) : "";
+					$margin_pounds = is_numeric($margin_pounds) ? round($margin_pounds,2) : "";
+					$margin_percent = is_numeric($margin_percent) ? round($margin_percent,1) : "";
+					
+					// NB: false & null are concatonated as empty string
+					$content .= '"'.$sku.'",';
+					$content .= '"'.$name.'",';
+					$content .= '"'.$price.'",';
+					$content .= '"'.$cost.'",';
+					$content .= '"'.$margin_pounds.'",';
+					$content .= '"'.$margin_percent.'"';
+					$content .= "\n";
+				}
+			}
+			catch (Exception $e)
+			{
+				$this->_getSession()->addError($e->getMessage());
+				$this->_redirect('*/*/index');
+			}
+			
+			$date = date('d_m_Y');
+			$filename = 'natures_cupboard_margins_'.$date.'.csv';
+			$this->_prepareDownloadResponse($filename, $content, 'text/csv');
+		}
+	}
 }

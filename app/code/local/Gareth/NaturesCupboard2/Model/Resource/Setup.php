@@ -871,19 +871,18 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 				die("Unknown attribute ".$attribute." in addAttributeToSet");
 			}
 		}
-		if ($set instanceof Mage_Eav_Model_Entity_Attribute_Set)
+		
+		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
+		$set = $lookup->findAttributeSet($set);
+		if (!is_null($set))
 		{
 			$setName = $set->getAttributeSetName();
 			$setId = $set->getId();
 		}
 		else
 		{
-			$setName = $eavSetup->getAttributeSet($entityTypeId, $set, 'attribute_set_name');
-			$setId = $eavSetup->getAttributeSet($entityTypeId, $set, 'attribute_set_id');
-			if ($setName==false or $setId==false)
-			{
-				die("Unknown attribute set ".$set." in addAttributeToSet");
-			}
+			die("Unknown attribute set ".$set." in addAttributeToSet");
 		}
 		
 		// addAttributeGroup() will update if group already exists

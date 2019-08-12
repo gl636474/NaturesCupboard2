@@ -72,6 +72,11 @@ class Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid extends Mage_
 				'label'=> Mage::helper('catalog')->__('Export pricing sheet'),
 				'url'  => $this->getUrl('*/*/pricingSheet')
 		));
+		
+		$this->getMassactionBlock()->addItem('margins', array(
+				'label'=> Mage::helper('catalog')->__('Export margins sheet'),
+				'url'  => $this->getUrl('*/*/marginsSheet')
+		));
 		// End of section added by Gareth
 		
 		

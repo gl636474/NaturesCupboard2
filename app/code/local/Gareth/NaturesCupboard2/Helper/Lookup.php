@@ -229,15 +229,53 @@ Mage_Core_Helper_Abstract
 	}
 	
 	/**
+	 * Returns the attribute object with the given name or ID.
+	 *
+	 * @param int|string|Mage_Eav_Model_Entity_Attribute $key name or ID or set instance to find
+	 *
+	 * @return Mage_Eav_Model_Entity_Attribute
+	 */
+	public function findAttribute($key)
+	{
+		if ($key instanceof Mage_Eav_Model_Entity_Attribute)
+		{
+			$attribute = $key;
+		}
+		elseif (is_numeric($key))
+		{
+			$entityType = Mage::getModel('catalog/product')->getResource()->getTypeId();
+			$attribute = Mage::getModel('eav/entity_attribute')->load($entityType, $key);
+		}
+		elseif (is_string($key))
+		{
+			$entityType = Mage::getModel('catalog/product')->getResource()->getTypeId();
+			$attribute = Mage::getModel('eav/entity_attribute')->loadByCode($entityType, $key);
+		}
+		
+		if (!is_null($attribute) and !is_null($attribute->getId()))
+		{
+			return $attribute;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
 	 * Returns the attribute set object with the given name or ID.
 	 *
-	 * @param int|string $nameOrId name or ID to find
+	 * @param int|string|Mage_Eav_Model_Entity_Attribute_Set $nameOrId name or ID or set instance to find
 	 *
 	 * @return Mage_Eav_Model_Entity_Attribute_Set
 	 */
 	public function findAttributeSet($nameOrId)
 	{
-		if (is_numeric($nameOrId))
+		if ($nameOrId instanceof Mage_Eav_Model_Entity_Attribute_Set)
+		{
+			$set = $nameOrId;
+		}
+		elseif (is_numeric($nameOrId))
 		{
 			$set = Mage::getModel('eav/entity_attribute_set')->load($nameOrId);
 			if (is_null($set))
@@ -285,7 +323,9 @@ Mage_Core_Helper_Abstract
 		$storeGroup = $this->getStoreGroup($storeKey);
 		$rootCatId = $storeGroup->getRootCategoryId();
 		
+		/* @var Mage_Catalog_Model_Resource_Category_Collection $categoriesCollection */
 		$categoriesCollection = Mage::getModel('catalog/category')->getCollection();
+		$categoriesCollection->addAttributeToSelect('name');
 		$categoriesCollection->addAttributeToFilter($attribute, $value);
 		$categoriesCollection->addAttributeToFilter('path', array('like' => '%/'.$rootCatId.'/%'));
 		
