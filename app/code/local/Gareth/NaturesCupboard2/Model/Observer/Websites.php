@@ -78,7 +78,7 @@ class Gareth_NaturesCupboard2_Model_Observer_Websites extends Varien_Object
 			$store = $lookup->getStore($constants->getNCStoreViewCode());
 			
 			$websiteId = $store->getWebsiteId();
-			$product->setWebsiteId($websiteId);
+			$product->setWebsiteIds(array($websiteId));
 			Mage::log('    Website set to '.$websiteId, Zend_Log::DEBUG, 'gareth.log');
 		}
 		else 
