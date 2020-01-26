@@ -16,8 +16,7 @@
  */
 
 /**
- * Observer to set add/remove a product to/from categories depending upon the
- * values of particular attributes of that product. Also locks the margin fields
+ * Observer to set the margin value of a product. Also locks the margin fields
  * when the admin is editing a product because anhy value(s) entered would be
  * immediately overwritten by these methods anyway.
  * <p>
