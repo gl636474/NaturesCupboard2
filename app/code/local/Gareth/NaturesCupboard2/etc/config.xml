@@ -88,6 +88,11 @@
                         <class>Gareth_NaturesCupboard2_Model_Observer_Margins</class>
                         <method>calculateMarginsOnProduct</method>
                     </Gareth_NaturesCupboard2_Product_Save_Margin_Calculator_Observer>
+                    <Gareth_NaturesCupboard2_Product_Save_Website_Checker_Observer>
+                      <type>singleton</type>
+                        <class>Gareth_NaturesCupboard2_Model_Observer_Websites</class>
+                        <method>checkWebsitesOnProduct</method>
+                    </Gareth_NaturesCupboard2_Product_Save_Website_Checker_Observer>
                 </observers>
             </catalog_product_save_before>
             <catalog_product_import_finish_before>
@@ -97,20 +102,25 @@
                         <class>Gareth_NaturesCupboard2_Model_Observer_Categories</class>
                         <method>setCategoriesOnMultipleProducts</method>
                     </Gareth_NaturesCupboard2_Product_Import_Categories_Observer>
-                    <Gareth_NaturesCupboard2_Product_Save_Margin_Calculator_Observer>
+                    <Gareth_NaturesCupboard2_Product_Import_Margin_Calculator_Observer>
                       <type>singleton</type>
                         <class>Gareth_NaturesCupboard2_Model_Observer_Margins</class>
                         <method>calculateMarginsOnMultipleProducts</method>
-                    </Gareth_NaturesCupboard2_Product_Save_Margin_Calculator_Observer>
+                    </Gareth_NaturesCupboard2_Product_Import_Margin_Calculator_Observer>
+                    <Gareth_NaturesCupboard2_Product_Import_Website_Checker_Observer>
+                      <type>singleton</type>
+                        <class>Gareth_NaturesCupboard2_Model_Observer_Websites</class>
+                        <method>checkWebsitesOnMultipleProducts</method>
+                    </Gareth_NaturesCupboard2_Product_Import_Website_Checker_Observer>
                 </observers>
             </catalog_product_import_finish_before>
             <catalog_product_edit_action>
                 <observers>
-                   <Gareth_NaturesCupboard2_Model_Product_Margin_Lock_Observer>
+                   <Gareth_NaturesCupboard2_Model_Product_Edit_Margin_Lock_Observer>
                       <type>singleton</type>
                         <class>Gareth_NaturesCupboard2_Model_Observer_Margins</class>
                         <method>lockMarginsOnProduct</method>
-                    </Gareth_NaturesCupboard2_Model_Product_Margin_Lock_Observer>
+                    </Gareth_NaturesCupboard2_Model_Product_Edit_Margin_Lock_Observer>
                 </observers>
             </catalog_product_edit_action>
         </events>

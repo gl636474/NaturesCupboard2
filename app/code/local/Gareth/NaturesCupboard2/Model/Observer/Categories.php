@@ -103,10 +103,11 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 	
 	/**
 	 * Returns the products_position values for the categories in the specified
-	 * mappings.
+	 * mappings. In English, this returns the products (by ID) in each category
+	 * (by ID). The root category will always be in the returned array.
 	 *  
 	 * @param array $mappings an array of mapped_attribute_code => category as returned by getAttributeCodeToCategoryMap()
-	 * @return array an array category_id => array(product_id => position) which is teh current product positions for each category
+	 * @return array an array category_id => array(product_id => position) which is the current product positions for each category
 	 */
 	protected function getCategoryProducts(array $mappings)
 	{
@@ -119,6 +120,21 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 			
 			$categoryProducts[$categoryId] = $productsPositions;
 		}
+		
+		// Now get root category
+		
+		/* @var Gareth_NaturesCupboard2_Helper_Constants $constants */
+		$constants= Mage::helper('gareth_naturescupboard2/constants');
+		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
+		/* @var Mage_Core_Model_Store $store */
+		$store = $lookup->getStore($constants->getNCStoreViewCode());
+		/* @var Mage_Catalog_Model_Category $rootCategory */
+		$rootCategory = $lookup->getRootCategory($store);
+		
+		$rootCategoryProductsPositions = $rootCategory->getProductsPosition();
+		$categoryProducts[$rootCategory->getId()] = $rootCategoryProductsPositions;
+		
 		return $categoryProducts;
 	}
 	
@@ -227,6 +243,14 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 				$categoryProducts[$categoryId][$productId] = 1;
 				Mage::log('     Added '.$productName.' to category '.$categoryId.' ('.$category->getName().')', Zend_Log::DEBUG, 'gareth.log');
 			}
+			else
+			{
+				Mage::log('     '.$productName.' already in category '.$categoryId.' ('.$category->getName().')', Zend_Log::DEBUG, 'gareth.log');
+			}
+		}
+		else 
+		{
+			Mage::log('     No such mapped category '.$categoryId.' ('.$category->getName().') when trying to add product: '.$productName, Zend_Log::DEBUG, 'gareth.log');
 		}
 		return $categoryProducts;
 	}
@@ -263,6 +287,14 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 				unset($categoryProducts[$categoryId][$productId]);
 				Mage::log('     Removed '.$productName.' from category '.$categoryId.' ('.$category->getName().')', Zend_Log::DEBUG, 'gareth.log');
 			}
+			else
+			{
+				Mage::log('     '.$productName.' already not in category '.$categoryId.' ('.$category->getName().')', Zend_Log::DEBUG, 'gareth.log');
+			}
+		}
+		else
+		{
+			Mage::log('     No such mapped category '.$categoryId.' ('.$category->getName().') when trying to remove product: '.$productName, Zend_Log::DEBUG, 'gareth.log');
 		}
 		return $categoryProducts;
 	}
@@ -302,6 +334,21 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 		{
 			Mage::log('     No change to categories', Zend_Log::DEBUG, 'gareth.log');
 		}
+		
+		// Ensure product is in the Nature's Cupboard root category (so it
+		// appears in the ALL category tab)
+		
+		/* @var Gareth_NaturesCupboard2_Helper_Constants $constants */
+		$constants= Mage::helper('gareth_naturescupboard2/constants');
+		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
+		/* @var Mage_Core_Model_Store $store */
+		$store = $lookup->getStore($constants->getNCStoreViewCode());
+		/* @var Mage_Catalog_Model_Category $rootCategory */
+		$rootCategory = $lookup->getRootCategory($store);
+		
+		$categoryProducts = $this->addProductToCategory($productId, $rootCategory, $categoryProducts);
+		
 		return $categoryProducts;
 	}
 	
@@ -329,6 +376,25 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 				Mage::log('Category '.$mappedCategory->getName().' saved ('.$products.')', Zend_Log::DEBUG, 'gareth.log');
 			}
 		}
+		
+		// Now save root category
+		/* @var Gareth_NaturesCupboard2_Helper_Constants $constants */
+		$constants= Mage::helper('gareth_naturescupboard2/constants');
+		/* @var Gareth_NaturesCupboard2_Helper_Lookup $lookup */
+		$lookup= Mage::helper('gareth_naturescupboard2/lookup');
+		/* @var Mage_Core_Model_Store $store */
+		$store = $lookup->getStore($constants->getNCStoreViewCode());
+		/* @var Mage_Catalog_Model_Category $rootCategory */
+		$rootCategory = $lookup->getRootCategory($store);
+		
+		$rootCategoryProductsPosition = $categoryProducts[$rootCategory->getId()];
+		$rootCategory->setPostedProducts($rootCategoryProductsPosition);
+		$rootCategory->save();
+		
+		$products = array_keys($rootCategoryProductsPosition);
+		$products = implode(',',$products);
+		Mage::log('Category '.$rootCategory->getName().' saved ('.$products.')', Zend_Log::DEBUG, 'gareth.log');
+				
 		// indexes are all intact at this point
 	}
 	
@@ -355,6 +421,7 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 		/* @var array $categoryProducts category_id => array(product_id => position) */
 		$categoryProducts = $this->getCategoryProducts($mappings);
 		
+		/* The attributes and their values for this product */
 		/* @var array $attributesValues attribute_code=>attribute_value */
 		$attributesValues = $this->getMappedAttributesAndValuesFromProduct($mappings, $product);
 				
@@ -388,6 +455,7 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 			{
 				Mage::log('  Product '.$productId.':', Zend_Log::NOTICE, 'gareth.log');
 				
+				/* The attributes and their values for this product */
 				/* @var array $attributesValues attribute_code=>attribute_value */
 				$attributesValues = $this->getMappedAttributesAndValuesFromDatabase($mappings, intval($productId));
 				

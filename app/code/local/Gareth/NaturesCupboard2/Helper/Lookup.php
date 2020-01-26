@@ -341,6 +341,32 @@ Mage_Core_Helper_Abstract
 	}
 	
 	/**
+	 * Returns the ID of the root category for the specified store.
+	 *
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store of which to return the root caetgory
+	 * @return integer
+	 */
+	public function getRootCategoryId($storeKey)
+	{
+		$storeGroup = $this->getStoreGroup($storeKey);
+		return $storeGroup->getRootCategoryId();
+	}
+	
+	/**
+	 * Returns the root category for the specified store.
+	 *
+	 * @param integer|string|Mage_Core_Model_Store|Mage_Core_Model_Store_Group $storeKey the store or group or id or name or name regex of the store of which to return the root caetgory
+	 * @return Mage_Catalog_Model_Category
+	 */
+	public function getRootCategory($storeKey)
+	{
+		$rootCategoryId = $this->getRootCategoryId($storeKey);
+		
+		$categoryModel = Mage::getModel('catalog/category');
+		return $categoryModel->load($rootCategoryId);
+	}
+	
+/**
 	 * Returns the category object with the given name. Only looks within the
 	 * specified store.
 	 *
