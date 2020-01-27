@@ -19,22 +19,13 @@
 <div class="page-title">
     <h1><?php echo Mage::helper('contacts')->__('Contact Us') ?></h1>
 </div>
+<p>We value your feedback. Please use the form or emails below to give us your
+suggestions, any corrections to information on this website, your comments or
+just to say hello!</p>
+<h2>By Form</h2>
 <form action="<?php echo $this->getFormAction(); ?>" id="contactForm" method="post">
     <div class="fieldset">
         <h2 class="legend"><?php echo Mage::helper('contacts')->__('Contact Information') ?></h2>
-        <p>We value your feedback. Please use the form below to give us your
-        suggestions, any corrections to information on this website, your
-        comments or just to say hello!</p>
-        <p>Alternativey you can use the following emails: 
-            <dl>
-                <dt>For enquiries about products:</dt>
-                <dd><a href="<?php echo Mage::getStoreConfig('trans_email/ident_sales/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_sales/name'); ?></a></dd>
-                <dt>For enquiries about deliveries, terms and conditions, changing account details and other customer services:</dt>
-                <dd><a href="<?php echo Mage::getStoreConfig('trans_email/ident_support/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_support/name'); ?></a></dd>
-                <dt>For general comments and suggestions:</dt>
-				<dd><a href="<?php echo Mage::getStoreConfig('trans_email/ident_general/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_general/name'); ?></a></dd>
-            </dl>
-        </p>
         <ul class="form-list">
             <li class="fields">
                 <div class="field">
@@ -70,6 +61,23 @@
         <button type="submit" title="<?php echo Mage::helper('core')->quoteEscape(Mage::helper('contacts')->__('Submit')) ?>" class="button"><span><span><?php echo Mage::helper('contacts')->__('Submit') ?></span></span></button>
     </div>
 </form>
+<h2>By Email</h2>
+<p>Alternativey you can use the following emails: 
+	<ul>
+		<li>
+			<a href="mailto:<?php echo Mage::getStoreConfig('trans_email/ident_sales/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_sales/email'); ?></a>
+			- For enquiries about products
+		</li>
+		<li>
+			<a href="mailto:<?php echo Mage::getStoreConfig('trans_email/ident_support/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_support/email'); ?></a>
+			- For enquiries about deliveries, terms and conditions, changing account details and other customer services
+		</li>
+		<li>
+			<a href="mailto:<?php echo Mage::getStoreConfig('trans_email/ident_general/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_general/email'); ?></a>
+			- For general comments and suggestions:
+		</li>
+	</ul>
+</p>
 <script type="text/javascript">
 //<![CDATA[
     var contactForm = new VarienForm('contactForm', true);
