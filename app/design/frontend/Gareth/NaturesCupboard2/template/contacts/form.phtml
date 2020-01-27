@@ -26,17 +26,14 @@
         suggestions, any corrections to information on this website, your
         comments or just to say hello!</p>
         <p>Alternativey you can use the following emails: 
-            <ul>
-                <li>For enquiries about products:
-                	<a href="<?php echo Mage::getStoreConfig('trans_email/ident_sales/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_sales/name'); ?></a>
-                </li>
-                <li>For enquiries about deliveries, terms and conditions, changing account details and other customer services:
-                	<a href="<?php echo Mage::getStoreConfig('trans_email/ident_support/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_support/name'); ?></a>
-                </li>
-                <li>For general comments and suggestions:
-					<a href="<?php echo Mage::getStoreConfig('trans_email/ident_general/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_general/name'); ?></a>
-				</li>
-            </ul>
+            <dl>
+                <dt>For enquiries about products:</dt>
+                <dd><a href="<?php echo Mage::getStoreConfig('trans_email/ident_sales/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_sales/name'); ?></a></dd>
+                <dt>For enquiries about deliveries, terms and conditions, changing account details and other customer services:</dt>
+                <dd><a href="<?php echo Mage::getStoreConfig('trans_email/ident_support/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_support/name'); ?></a></dd>
+                <dt>For general comments and suggestions:</dt>
+				<dd><a href="<?php echo Mage::getStoreConfig('trans_email/ident_general/email'); ?>"><?php echo Mage::getStoreConfig('trans_email/ident_general/name'); ?></a></dd>
+            </dl>
         </p>
         <ul class="form-list">
             <li class="fields">
