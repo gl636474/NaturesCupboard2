@@ -64,17 +64,17 @@ class Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid extends Mage_
 		
 		// Start of section added by Gareth
 		$this->getMassactionBlock()->addItem('export', array(
-				'label'=> Mage::helper('catalog')->__('Export to CSV'),
+				'label'=> Mage::helper('catalog')->__('Export to spreadsheet'),
 				'url'  => $this->getUrl('*/*/massExport')
 		));
 
 		$this->getMassactionBlock()->addItem('pricing', array(
-				'label'=> Mage::helper('catalog')->__('Export pricing sheet'),
+				'label'=> Mage::helper('catalog')->__('Download customer order form'),
 				'url'  => $this->getUrl('*/*/pricingSheet')
 		));
 		
 		$this->getMassactionBlock()->addItem('margins', array(
-				'label'=> Mage::helper('catalog')->__('Export margins sheet'),
+				'label'=> Mage::helper('catalog')->__('Download margins and stock spreadsheet'),
 				'url'  => $this->getUrl('*/*/marginsSheet')
 		));
 		// End of section added by Gareth

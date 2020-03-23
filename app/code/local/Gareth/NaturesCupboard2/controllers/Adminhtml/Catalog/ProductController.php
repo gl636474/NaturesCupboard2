@@ -223,7 +223,7 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 				$store = $lookup->getStore($storeCode);
 				
 				//write headers to the csv file
-				$content = '"SKU","Product","Price per unit","Cost Price","Margin (£)","Margin (%)"'."\n";
+				$content = '"SKU","Product","Price per unit","RRP","Cost Price","Margin (£)","Margin (%)","Quantity in stock"'."\n";
 
 				//write data to the csv file
 				foreach ($productIds as $productId)
@@ -235,22 +235,31 @@ class Gareth_NaturesCupboard2_Adminhtml_Catalog_ProductController extends Mage_A
 					$name = $resource->getAttributeRawValue($productId, 'name', $store);
 					
 					$price = $resource->getAttributeRawValue($productId, 'price', $store);
+					$rrp = $resource->getAttributeRawValue($productId, 'msrp', $store);
 					$cost = $resource->getAttributeRawValue($productId, 'cost', $store);
 					$margin_pounds = $resource->getAttributeRawValue($productId, 'margin_pounds', $store);
 					$margin_percent = $resource->getAttributeRawValue($productId, 'margin_percent', $store);
 					
-					$price = is_numeric($price) ? round($price,2) : "";
-					$cost = is_numeric($cost) ? round($cost,2) : "";
-					$margin_pounds = is_numeric($margin_pounds) ? round($margin_pounds,2) : "";
-					$margin_percent = is_numeric($margin_percent) ? round($margin_percent,1) : "";
+					/** @var Mage_CatalogInventory_Model_Stock_Item $stock_item */
+					$stock_item = Mage::getModel('cataloginventory/stock_item')->loadByProduct($productId);
+					$quantity = $stock_item->getQty();
+					
+					$price = is_numeric($price) ? number_format($price,2) : "";
+					$rrp = is_numeric($rrp) ? number_format($rrp,2) : "";
+					$cost = is_numeric($cost) ? number_format($cost,2) : "";
+					$margin_pounds = is_numeric($margin_pounds) ? number_format($margin_pounds,2) : "";
+					$margin_percent = is_numeric($margin_percent) ? number_format($margin_percent,1) : "";
+					$quantity = is_numeric($quantity) ? number_format($quantity) : "";
 					
 					// NB: false & null are concatonated as empty string
 					$content .= '"'.$sku.'",';
 					$content .= '"'.$name.'",';
 					$content .= '"'.$price.'",';
+					$content .= '"'.$rrp.'",';
 					$content .= '"'.$cost.'",';
 					$content .= '"'.$margin_pounds.'",';
-					$content .= '"'.$margin_percent.'"';
+					$content .= '"'.$margin_percent.'",';
+					$content .= '"'.$quantity.'"';
 					$content .= "\n";
 				}
 			}
