@@ -6,13 +6,13 @@ skin/frontend/Gareth/NaturesCupboard2        skin/frontend/Gareth/NaturesCupboar
 app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupboard2.xml
 
 # Create logs - Magento 1.9.4.x needs these files to already exist
-@shell mkdir "$PROJECT/var/log"
+@shell mkdir -p "$PROJECT/var/log"
 @shell touch "$PROJECT/var/log/system.log"
 @shell touch "$PROJECT/var/log/gareth.log"
 @shell touch "$PROJECT/var/log/exception.log"
 
 # Copy required images/etc to media directory
-@shell mkdir "$PROJECT/media/email/logo/naturescupboard"
+@shell mkdir -p "$PROJECT/media/email/logo/naturescupboard"
 @shell cp "$PROJECT/skin/frontend/Gareth/NaturesCupboard2/images/nc_logo_email.png" "$PROJECT/media/email/logo/naturescupboard/"
 
 # Set global read permissions on static files (CSS/Javascript)
