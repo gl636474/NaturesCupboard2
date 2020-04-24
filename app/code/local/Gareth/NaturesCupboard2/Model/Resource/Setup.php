@@ -1617,7 +1617,9 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	/**
 	 * Sets system configuration values. A number of configuration values will
 	 * be set to sensible (but not Magento default) values. Any of these can be
-	 * overridden in the argumnet.
+	 * overridden in the argumnet. Only config keys in the ALLOWED_SYS_CONF_*
+	 * arrays will be set - all other keys will be ignored. Type checking and
+	 * some value checking is performed.
 	 * 
 	 * @param array $path_values and array of path to value. E.g. array('general/country/default'=>'GB')
 	 * @param $useDefaults string whether to set default values for configs not specified in $path_values
@@ -1707,7 +1709,18 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		// merge all cleaned path=>value pairs into one array
 		$config = array_merge($stringConfigs, $booleanConfigs, $numericConfigs,
 				$currencyConfigs, $emailConfigs, $countryConfigs);
-		
+
+		$this->setSystemConfigRaw($config);
+	}
+	
+	/**
+	 * Sets the config paths to the supplied values. No type, value or key
+	 * checks are perfoemd.
+	 * 
+	 * @param array $config array of "config/key/path" => "config_vlue"
+	 */
+	public function setSystemConfigRaw($config)
+	{
 		// convert from path=>value to array format
 		$sections_configs = $this->splitConfigPathsIntoArray($config);
 		

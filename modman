@@ -11,6 +11,10 @@ app/etc/modules/Gareth_NaturesCupboard2.xml  app/etc/modules/Gareth_NaturesCupbo
 @shell touch "$PROJECT/var/log/gareth.log"
 @shell touch "$PROJECT/var/log/exception.log"
 
+# Copy required images/etc to media directory
+@shell mkdir "$PROJECT/media/email/logo/naturescupboard"
+@shell cp "$PROJECT/skin/frontend/Gareth/NaturesCupboard2/images/nc_logo_email.png" "$PROJECT/media/email/logo/naturescupboard/"
+
 # Set global read permissions on static files (CSS/Javascript)
 @shell chmod -R a+r "$PROJECT/js"
 @shell chmod -R a+X "$PROJECT/js"
