@@ -3,6 +3,18 @@
 class Gareth_NaturesCupboard2_Helper_Data extends Mage_Core_Helper_Abstract
 {
 	const XML_PATH_PAYMENTS_CONFIG_TABLE = 'payment/allow/methods_config_table';
+	const XML_PATH_PAYMENTS_OTHERS = 'payment/allow/others';
+	
+	/**
+	 * Returns the default behaviour in case a payment method or customergroup
+	 * is not found in the config table.
+	 * 
+	 * @return boolean whether to allow or disalw a ayment method
+	 */
+	public function getDefaultPaymentMethodAllowed()
+	{
+		return (boolval(Mage::getStoreConfig(self::XML_PATH_PAYMENTS_OTHERS)));
+	}
 	
 	/**
 	 * Returns un-serialized data of the custom config field one

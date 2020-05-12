@@ -77,6 +77,17 @@
                 <class>Gareth_NaturesCupboard2_Block</class>
              </gareth_naturescupboard2>
         </blocks>
+        <events>
+            <payment_method_is_active>
+                <observers>
+                    <Gareth_NaturesCupboard2_Payment_Method_Active_Filter_Observer>
+                        <type>singleton</type>
+                        <class>Gareth_NaturesCupboard2_Model_Observer_PaymentMethods</class>
+                        <method>filterPaymentMethod</method>
+                    </Gareth_NaturesCupboard2_Payment_Method_Active_Filter_Observer>
+                </observers>
+            </payment_method_is_active>
+        </events>
  	</global>
 	<adminhtml>
         <events>
