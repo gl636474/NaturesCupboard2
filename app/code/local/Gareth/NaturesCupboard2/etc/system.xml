@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * Natures Cupboard 2 Magento extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is copyright Gareth Ladd 2020. Not for public dissemination
+ * nor use.
+ *
+ * DISCLAIMER
+ *
+ * This program is private software. It comes without any warranty, to
+ * the extent permitted by applicable law. You may not copy, modify nor
+ * distribute it. The author takes no responsibility for any consequences of
+ * unauthorised usage of this file or any part thereof.
+ */
+ -->
+
+<config>
+    <sections>
+        <!-- Adding New Group Under System -> Configuration -> General -> General -->
+        <!-- TODO add under sales / payment methods - at the top -->
+        <payment>
+            <groups>
+                <allow translate="label" module="gareth_naturescupboard2">
+                    <label>Payment Method Allow / Disallow by Customer Group</label>
+                    <sort_order>1</sort_order>
+                    <show_in_store>1</show_in_store>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <frontend_type>text</frontend_type>
+                    <fields>
+                        <!-- Custom, "table-like" configuration field -->
+                        <methods_config_table translate="label">
+                            <label>Payment Method Config</label>
+                            <sort_order>10</sort_order>
+                            <show_in_store>1</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_default>1</show_in_default>
+                            <!-- Specific backend class to handle serialized data -->
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <!-- Specific frontend class to render custom field -->
+                            <frontend_model>gareth_naturescupboard2/adminhtml_form_field_paymentMethodsConfigTable</frontend_model>
+                        </methods_config_table>
+                        <others>
+                            <label>Default for new/omitted payment methods and customer groups</label>
+                            <sort_order>20</sort_order>
+                            <show_in_store>1</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_default>1</show_in_default>
+                            <frontend_type>select</frontend_type>
+                            <source_model>gareth_naturescupboard2/system_config_source_allowdisallow</source_model>  
+                        </others>
+                    </fields>
+                </allow>
+            </groups>
+        </payment>
+    </sections>
+</config>

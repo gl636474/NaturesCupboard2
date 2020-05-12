@@ -24,6 +24,7 @@
             <codePool>local</codePool>
             <depends>
                 <Mage_Catalog />
+                <Mage_Adminhtml />
             </depends>
         </Gareth_NaturesCupboard2>
     </modules>

@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Gareth_NaturesCupboard2>
-            <version>1.1.1</version>
+            <version>1.2.0</version>
         </Gareth_NaturesCupboard2>
     </modules>
     <global>
@@ -72,6 +72,10 @@
                     <catalog_product_grid>Gareth_NaturesCupboard2_Adminhtml_Block_Catalog_Product_Grid</catalog_product_grid>
                 </rewrite>
              </adminhtml>
+             <gareth_naturescupboard2>
+                <!-- Prefix for all Block class names -->
+                <class>Gareth_NaturesCupboard2_Block</class>
+             </gareth_naturescupboard2>
         </blocks>
  	</global>
 	<adminhtml>
