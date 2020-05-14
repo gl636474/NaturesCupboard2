@@ -26,29 +26,43 @@ class Gareth_NaturesCupboard2_Model_Observer_PaymentMethods extends Varien_Objec
 	 */
 	public function filterPaymentMethod($observer)
 	{
-		/* @var Mage_Payment_Model_Method_Abstract $method concrete payment method subclass */
-		$method = $observer->getEvent()->getMethodInstance();
-		$methodCode = $method->getCode();
-		$customerGroupId = (int)Mage::getSingleton('customer/session')->getCustomerGroupId();
-		/* @var Gareth_NaturesCupboard2_Helper_Data $helper */
-		$helper = Mage::helper('gareth_naturescupboard2/data');
-		
-		// First set the default. Then work through config to see if we have a
-		// match for this method and customer group. NB Only set true if
-		// originl value also true, hence AND-EQUALS logic
-		$observer->getResult()->isAvailable &= $helper->getDefaultPaymentMethodAllowed();
-		
-		// Now search thru the methods/custgroups config table for an override
-		$configTable = $helper->getPaymentMethodsConfigTable();
-		foreach ($configTable as $methodConfig)
+		// Dont' filter if we are admin logged into back end
+		/**
+		 *  @var Mage_Admin_Model_Session $adminSession 
+		 *  "admin/session" instance is instantiated in front end also
+		 */
+		$adminSession = Mage::getSingleton("admin/session");
+		if ($adminSession->isLoggedIn() == false)
 		{
-			if ($methodConfig['method'] == $methodCode)
+			/** 
+			 * @var Mage_Payment_Model_Method_Abstract $method 
+			 * $method will be a concrete subclass
+			 */
+			$method = $observer->getEvent()->getMethodInstance();
+			$methodCode = $method->getCode();
+			/* @var Mage_Customer_Model_Session $customerSession */
+			$customerSession = Mage::getSingleton("customer/session");
+			$customerGroupId = (int)$customerSession->getCustomerGroupId();
+			/* @var Gareth_NaturesCupboard2_Helper_Data $helper */
+			$helper = Mage::helper('gareth_naturescupboard2/data');
+			
+			// First set the default. Then work through config to see if we have a
+			// match for this method and customer group. NB Only set true if
+			// originl value also true, hence AND-EQUALS logic
+			$observer->getResult()->isAvailable &= $helper->getDefaultPaymentMethodAllowed();
+			
+			// Now search thru the methods/custgroups config table for an override
+			$configTable = $helper->getPaymentMethodsConfigTable();
+			foreach ($configTable as $methodConfig)
 			{
-				if (array_key_exists($customerGroupId, $methodConfig))
+				if ($methodConfig['method'] == $methodCode)
 				{
-					// NB AND-EQUALS so an existing false isn't overwritten
-					$observer->getResult()->isAvailable &= $methodConfig[$customerGroupId];
-					break;
+					if (array_key_exists($customerGroupId, $methodConfig))
+					{
+						// NB AND-EQUALS so an existing false isn't overwritten
+						$observer->getResult()->isAvailable &= $methodConfig[$customerGroupId];
+						break;
+					}
 				}
 			}
 		}

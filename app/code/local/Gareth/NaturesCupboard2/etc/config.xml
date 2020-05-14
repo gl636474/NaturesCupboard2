@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Gareth_NaturesCupboard2>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
         </Gareth_NaturesCupboard2>
     </modules>
     <global>
@@ -91,7 +91,7 @@
  	</global>
 	<adminhtml>
         <events>
-            <catalog_product_save_before>
+            <catalog_product_save_after>
                 <observers>
                     <Gareth_NaturesCupboard2_Product_Save_Categories_Observer>
                     	<type>singleton</type>
@@ -109,7 +109,7 @@
                         <method>checkWebsitesOnProduct</method>
                     </Gareth_NaturesCupboard2_Product_Save_Website_Checker_Observer>
                 </observers>
-            </catalog_product_save_before>
+            </catalog_product_save_after>
             <catalog_product_import_finish_before>
                 <observers>
                     <Gareth_NaturesCupboard2_Product_Import_Categories_Observer>
