@@ -496,7 +496,7 @@ textarea {
 }
 
 a {
-  color: #90A128;
+  color: rgb(130,102,10);
   text-decoration: none;
 }
 
@@ -2074,7 +2074,7 @@ span.weee {
   margin-bottom: 15px;
   border-bottom: 1px solid #cccccc;
   border-top: 1px solid #cccccc;
-  color: #99B200;
+  color: rgb(117,136,0);
   background: rgba(144,161,40,0.5);
   padding: 5px 10px 0px 10px;
 }
@@ -2739,7 +2739,7 @@ p.required,
 }
 .form-list select {
   margin-top: 4px;
-  width: 365px;
+  width: 200px;
   max-width: 100%;
 }
 .form-list .input-range .input-text {
@@ -3154,7 +3154,7 @@ body {
   background-position: left top;
   background-clip: border-box;
   background-origin: padding-box;
-  background-size: cover, auto;
+  background-size: 100%, auto;
 }
 
 .wrapper:after {
@@ -3164,7 +3164,7 @@ body {
 }
 
 .main {
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(255,255,255,1);
   padding: 7px;
 }
 
@@ -3395,7 +3395,7 @@ a.skip-link {
  * ============================================ */
 
 #nav {
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(255,255,255,1);
 }
 
 @media only screen and (max-width: 770px) {
@@ -3593,7 +3593,7 @@ a.skip-link {
   }
   .nav-primary a:hover,
   .nav-primary li:hover > a {
-    color: #677518;
+    color: rgb(223,188,46);
   }
   .nav-primary .menu-active {
     z-index: 200;
@@ -4234,7 +4234,7 @@ h3.product-name a,
 h4.product-name a,
 h5.product-name a,
 p.product-name a {
-  color: rgb(255,236,130);
+  color: rgb(169,204,7);
 }
 h2.product-name a:hover,
 h3.product-name a:hover,
@@ -10617,4 +10617,12 @@ div.calendar table td.button {
   background: inherit;
   color: inherit;
   text-transform: none;
+}
+
+/* ============================================
+ * Added by GL
+ * ============================================ */
+td.contacts-table {
+	vertical-align: top;
+	padding: 1em;
 }
