@@ -70,7 +70,9 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	private static $_attributeSetGroupName = 'NC Product Info';
 	
 	/**
-	 * Cached Mage_Catalog_Model_Resource_Eav_Mysql4_Setup instance.
+	 * Cached EAV model setup instance.
+	 * 
+	 * @var Mage_Catalog_Model_Resource_Eav_Mysql4_Setup
 	 */
 	private static $_eavSetup = null;
 	
@@ -361,7 +363,7 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	{
 		if (is_null(self::$_eavSetup))
 		{
-			/* @var self::$_eavSetup Mage_Catalog_Model_Resource_Eav_Mysql4_Setup */
+			/* @var Mage_Catalog_Model_Resource_Eav_Mysql4_Setup self::$_eavSetup  */
 			self::$_eavSetup = Mage::getResourceModel('catalog/eav_mysql4_setup', 'core_setup');
 		}
 		return self::$_eavSetup;
@@ -592,6 +594,53 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 	}
 	
 	/**
+	 * Add multiple products to a category by SKU.
+	 * 
+	 * @param Mage_Catalog_Model_Category $category The category to add products to
+	 * @param array $skus an array of SKU strings to add to the category
+	 * @return array the SKUs that were added to the category = $skus minus any non-existent SKU(s)
+	 */
+	public function addSkusToCategory($category, $skus)
+	{
+		$categoryName = $category->getName();
+		$productsPosition = $category->getProductsPosition();
+		$productsAdded = array();
+		
+		/* @var Mage_Catalog_Model_Product $model */
+		$model = Mage::getModel('catalog/product');
+		foreach ($skus as $sku)
+		{
+			$productId = $model->getIdBySku($sku);
+			if (is_numeric($productId) && $productId > 0)
+			{
+				$productId = intval($productId);
+				if (!array_key_exists($productId, $productsPosition))
+				{
+					$productsPosition[$productId] = 0;
+				}
+				$productsAdded[] = $sku;
+				// will be logged later - all together
+			}
+			else
+			{
+				Mage::log("addSkusToCategory(): $sku does not exist", Zend_Log::INFO, 'gareth.log');
+			}
+		}
+		if (count($productsAdded) > 0)
+		{
+			$category->setPostedProducts($productsPosition);
+			$category->save();
+			$skuList = implode(',', $productsAdded);
+			Mage::log("Products added to $categoryName: $skuList", Zend_Log::NOTICE, 'gareth.log');
+		}
+		else
+		{
+			Mage::log("No change to products in category $categoryName", Zend_Log::DEBUG, 'gareth.log');
+		}
+		return $productsAdded;
+	}
+	
+	/**
 	 * 
 	 * @param integer|string|Mage_Eav_Model_Entity_Attribute $attribute the ID, code or instance of the attribute to edit 
 	 * @param string $property the name of the property of $attribute to set
@@ -762,6 +811,21 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		return $model;
 	}
 
+	/**
+	 * Removes a product attribute and any associated values in the EAV tables,
+	 * i.e. catalog_product_entity_*.
+	 * 
+	 * @param string $code the code of the attribute to delete
+	 */
+	public function removeAttribute($code)
+	{
+		/* @var Mage_Catalog_Model_Resource_Eav_Mysql4_Setup $eavSetup */
+		$eavSetup = $this->_getEavSetup();
+		// safe/noop if attribute code does not exist
+		$eavSetup->removeAttribute('catalog_product', $code);
+		Mage::log("Attribute with code $code deleted (if it existed)", Zend_Log::NOTICE, 'gareth.log');
+	}
+	
 	/**
 	 * Add an admin only attribute or updates existing admin only attribute with
 	 * the given name. An admin only attribute will not be seen by the 
@@ -982,9 +1046,15 @@ class Gareth_NaturesCupboard2_Model_Resource_Setup extends Mage_Core_Model_Resou
 		/* @var Gareth_NaturesCupboard2_Model_AttribToCategoryMapping $attrib_category_mapping */
 		$attrib_category_mapping = $lookup->findAttributeToCategoryMapping($attribute_code, $category_url_key);
 		
-		$attrib_category_mapping->delete();
-		
-		Mage::log('AttributeToCategoryMapping ('.$attribute_code.' to '.$category_url_key.') deleted', Zend_Log::NOTICE, 'gareth.log');
+		if (!is_null($attrib_category_mapping))
+		{
+			$attrib_category_mapping->delete();
+			Mage::log('AttributeToCategoryMapping ('.$attribute_code.' to '.$category_url_key.') deleted', Zend_Log::NOTICE, 'gareth.log');
+		}
+		else
+		{
+			Mage::log('Cannot delete AttributeToCategoryMapping ('.$attribute_code.' to '.$category_url_key.') - does not exist', Zend_Log::INFO, 'gareth.log');
+		}
 	}
 	
 	/**
