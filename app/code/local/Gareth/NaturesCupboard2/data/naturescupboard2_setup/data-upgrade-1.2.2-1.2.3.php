@@ -283,7 +283,7 @@ $helper->addCategory('Breakfast', 'breakfast', $category_food, $category_breakfa
 
 
 $category_nutfruitseed_blurb = "We endevour to bring you the healthiest selection of nuts, dries fruits and seeds $usual_blurb.";
-$category_nutfruitseed = $helper->addCategory('Nuts, Drired Fruits and Seeds', 'nuts-dried-fruits-seeds', $category_food, $category_nutfruitseed_blurb, 'Nuts, Dried Fruits and Seeds', array());
+$category_nutfruitseed = $helper->addCategory('Nuts, Dried Fruits and Seeds', 'nuts-dried-fruits-seeds', $category_food, $category_nutfruitseed_blurb, 'Nuts, Dried Fruits and Seeds', array());
 
 $category_nut_blurb = "We endevour to bring you the healthiest nuts $usual_blurb.";
 $helper->addCategory('Nuts', 'nuts', $category_nutfruitseed, $category_nut_blurb, 'Nuts', array(
