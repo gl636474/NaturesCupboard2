@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Gareth_NaturesCupboard2>
-            <version>1.2.3</version>
+            <version>1.2.4</version>
         </Gareth_NaturesCupboard2>
     </modules>
     <global>
@@ -91,13 +91,8 @@
  	</global>
 	<adminhtml>
         <events>
-            <catalog_product_save_after>
+            <catalog_product_save_before>
                 <observers>
-                    <Gareth_NaturesCupboard2_Product_Save_Categories_Observer>
-                    	<type>singleton</type>
-                        <class>Gareth_NaturesCupboard2_Model_Observer_Categories</class>
-                        <method>setCategoriesOnProduct</method>
-                    </Gareth_NaturesCupboard2_Product_Save_Categories_Observer>
                     <Gareth_NaturesCupboard2_Product_Save_Margin_Calculator_Observer>
                       <type>singleton</type>
                         <class>Gareth_NaturesCupboard2_Model_Observer_Margins</class>
@@ -108,6 +103,15 @@
                         <class>Gareth_NaturesCupboard2_Model_Observer_Websites</class>
                         <method>checkWebsitesOnProduct</method>
                     </Gareth_NaturesCupboard2_Product_Save_Website_Checker_Observer>
+                </observers>
+            </catalog_product_save_before>
+            <catalog_product_save_after>
+                <observers>
+                    <Gareth_NaturesCupboard2_Product_Save_Categories_Observer>
+                    	<type>singleton</type>
+                        <class>Gareth_NaturesCupboard2_Model_Observer_Categories</class>
+                        <method>setCategoriesOnProduct</method>
+                    </Gareth_NaturesCupboard2_Product_Save_Categories_Observer>
                 </observers>
             </catalog_product_save_after>
             <catalog_product_import_finish_before>

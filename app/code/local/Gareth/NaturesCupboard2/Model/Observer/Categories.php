@@ -399,7 +399,7 @@ class Gareth_NaturesCupboard2_Model_Observer_Categories extends Varien_Object
 	}
 	
 	/**
-	 * Function called when the catalog_product_save_before event is fired.
+	 * Function called when the catalog_product_save_after event is fired.
 	 * Observer configured in config.xml.
 	 * 
 	 * The changes made by the admin will be in the product object and not in
